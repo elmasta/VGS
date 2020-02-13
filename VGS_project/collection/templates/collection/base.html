@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
 
   <!-- Custom styles for this template-->
-  <link rel="stylesheet" href="{% static 'collection/vendor/css/sb-admin-2.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'collection/css/sb-admin-2.min.css' %}" />
 
 </head>
 
@@ -35,7 +35,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
           <i class="fas fa-laugh-wink"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+        <div class="sidebar-brand-text mx-3">VGS <sup>beta</sup></div>
       </a>
 
       <!-- Divider -->
@@ -329,27 +329,35 @@
 
         </nav>
         <!-- End of Topbar -->
+
+        {% block content %}{% endblock %}
+
+        <!-- todo old footer -->
+        <!-- Footer -->
+        <footer class="bg-light py-5">
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-6 ml-auto text-center mb-5 mb-lg-0">
+                <a href="/product/legal_notice">mentions legals</a>
+              </div>
+              <div class="col-lg-6 mr-auto text-center">
+                <a href="mailto:john@doe.com">contact</a>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      <!-- End of Main Content -->
       </div>
+    <!-- End of Content Wrapper -->
     </div>
+  <!-- End of Page Wrapper -->
   </div>
 
-
-  {% block content %}{% endblock %}
-
-  <!-- todo old footer -->
-  <!-- Footer -->
-  <footer class="bg-light py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 ml-auto text-center mb-5 mb-lg-0">
-          <a href="/product/legal_notice">mentions legals</a>
-        </div>
-        <div class="col-lg-6 mr-auto text-center">
-          <a href="mailto:john@doe.com">contact</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
 
   <!-- Bootstrap core JavaScript -->
   <script src="{% static 'collection/vendor/jquery/jquery.min.js' %}" /></script>
