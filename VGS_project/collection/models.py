@@ -23,12 +23,25 @@ class Condition(models.IntegerChoices):
     TRES_BON = 5
     NEUF = 6
 
+class Owning(models.IntegerChoices):
+
+    POSSEDE = 1
+    VENDU = 2
+    DONNEE = 3
+    PRET_DUN_AMI = 4
+    ABONEMENT = 5
+    AUTRE = 6
+
 
 class UserData(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profil_picture = models.ImageField(upload_to=get_userpic_path, blank=True,
                                        null=True, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class Plateform(models.Model):
 
@@ -48,6 +61,10 @@ class Plateform(models.Model):
         AFRIQUE = 9
     region = models.IntegerField(choices=Region.choices,
                                  on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class CollectionPicture(models.Model):
 
@@ -56,6 +73,10 @@ class CollectionPicture(models.Model):
                                            blank=True,
                                            null=True,
                                            on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class SubPlateform(models.Model):
 
@@ -63,6 +84,10 @@ class SubPlateform(models.Model):
     name = models.CharField(max_length=100, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path,
                                 on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class PlateformAddon(models.Model):
 
@@ -70,13 +95,33 @@ class PlateformAddon(models.Model):
     name = models.CharField(max_length=100, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path,
                                 on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
+
+class Compilation(models.Model):
+
+    name = models.CharField(max_length=100, on_delete=models.CASCADE)
+    plateform = models.ForeignKey(SubPlateform, on_delete=models.CASCADE)
+    picture = models.ImageField(upload_to=get_adminpic_path,
+                                on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class Games(models.Model):
 
     name = models.CharField(max_length=100, on_delete=models.CASCADE)
-    subplateform = models.ForeignKey(SubPlateform, on_delete=models.CASCADE)
+    plateform = models.ForeignKey(SubPlateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path,
                                 on_delete=models.CASCADE)
+    compilation = models.ManyToManyField(Compilation, related_name='id')
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class GameDLC(models.Model):
 
@@ -84,19 +129,58 @@ class GameDLC(models.Model):
     game = models.ForeignKey(Games, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path,
                                 on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
+
+class UserOwnedCompilation(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    #id from Games table (game_id) only if user link his game to the game
+    #database
+    compilation_id = models.ForeignKey(Compilation, blank=True, null=True,
+                                       on_delete=models.CASCADE)
+    compilation_name = models.CharField(max_length=200,
+                                        on_delete=models.CASCADE)
+    plateform_id = models.ForeignKey(Plateform, blank=True, null=True,
+                                     on_delete=models.CASCADE)
+    physical = models.BooleanField(on_delete=models.CASCADE)
+    picture = models.ImageField(upload_to=get_userpic_path, blank=True,
+                                null=True, on_delete=models.CASCADE)
+    box_condition = models.IntegerField(choices=Condition.choices,
+                                        blank=True, null=True,
+                                        on_delete=models.CASCADE)
+    covers_condition = models.IntegerField(choices=Condition.choices,
+                                           blank=True, null=True,
+                                           on_delete=models.CASCADE)
+    manual_condition = models.IntegerField(choices=Condition.choices,
+                                           blank=True, null=True,
+                                           on_delete=models.CASCADE)
+    game_condition = models.IntegerField(choices=Condition.choices,
+                                         blank=True, null=True,
+                                         on_delete=models.CASCADE)
+    condition_precision = models.TextField(blank=True, null=True,
+                                           on_delete=models.CASCADE)
+    owning_status = models.IntegerField(choices=Owning.choices,
+                                        on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class UserOwnedGame(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    #either id from Games table (game_id) or name if it's a made up game from
-    #the user
+    #id from Games table (game_id) only if user link his game to the game
+    #database
     game_id = models.ForeignKey(Games, blank=True, null=True,
                                 on_delete=models.CASCADE)
-    game_name = models.CharField(max_length=200, blank=True, null=True,
-                                 on_delete=models.CASCADE)
-    #subplateform_id only when it's a made up game from the user
-    subplateform_id = models.ForeignKey(SubPlateform, blank=True, null=True,
-                                        on_delete=models.CASCADE)
+    game_name = models.CharField(max_length=200, on_delete=models.CASCADE)
+    plateform_id = models.ForeignKey(Plateform, blank=True, null=True,
+                                     on_delete=models.CASCADE)
+    compilation = models.ManyToManyField(UserOwnedCompilation,
+                                         related_name='id')
     physical = models.BooleanField(on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
                                 null=True, on_delete=models.CASCADE)
@@ -134,6 +218,12 @@ class UserOwnedGame(models.Model):
                                               on_delete=models.CASCADE)
     achievements_to_be_earned = models.IntegerField(blank=True, null=True,
                                                     on_delete=models.CASCADE)
+    owning_status = models.IntegerField(choices=Owning.choices,
+                                        on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class UserOwnedGameDLC(models.Model):
 
@@ -142,8 +232,7 @@ class UserOwnedGameDLC(models.Model):
     #the user
     gamedlc_id = models.ForeignKey(GameDLC, blank=True, null=True,
                                    on_delete=models.CASCADE)
-    gamedlc_name = models.CharField(max_length=200, blank=True, null=True,
-                                    on_delete=models.CASCADE)
+    gamedlc_name = models.CharField(max_length=200, on_delete=models.CASCADE)
     physical = models.BooleanField(on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
                                 null=True, on_delete=models.CASCADE)
@@ -165,6 +254,12 @@ class UserOwnedGameDLC(models.Model):
                                  on_delete=models.CASCADE)
     rating_precision = models.TextField(blank=True, null=True,
                                         on_delete=models.CASCADE)
+    owning_status = models.IntegerField(choices=Owning.choices,
+                                        on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class UserOwnedSubPlateform(models.Model):
 
@@ -186,6 +281,10 @@ class UserOwnedSubPlateform(models.Model):
                                                  on_delete=models.CASCADE)
     condition_precision = models.TextField(blank=True, null=True,
                                            on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
 
 class UserOwnedPlateformAddon(models.Model):
 
@@ -208,3 +307,7 @@ class UserOwnedPlateformAddon(models.Model):
                                                    on_delete=models.CASCADE)
     condition_precision = models.TextField(blank=True, null=True,
                                            on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True,
+                                      on_delete=models.CASCADE)
