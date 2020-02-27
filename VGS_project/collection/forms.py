@@ -14,6 +14,16 @@ class UserCreationForm(ModelForm):
             "password": PasswordInput(attrs={"class": "form-control"}),
         }
 
+class UserLoginForm(ModelForm):
+
+    class Meta:
+        model = User
+        fields = ["email", "password"]
+        widgets = {
+            "email": EmailInput(attrs={"class": "form-control"}),
+            "password": PasswordInput(attrs={"class": "form-control"}),
+        }
+
 class ParagraphErrorList(ErrorList):
 
     def __str__(self):

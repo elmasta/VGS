@@ -50,6 +50,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'valentinrobin1@gmail.com'
+EMAIL_HOST_PASSWORD = str(os.getenv("MAILPASS"))
+EMAIL_PORT = 587
+
 INTERNAL_IPS = ['127.0.0.1']
 
 ROOT_URLCONF = 'VGS_project.urls'

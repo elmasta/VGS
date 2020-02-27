@@ -1,0 +1,6 @@
+{% autoescape off %}
+Bonjour {{ user.username }},
+Veuillez confirmer la création de votre compte en cliquant sur le lien suivant:
+<!-- todo update url -->
+http://{% url 'activate' uidb64=uid token=token %}
+{% endautoescape %}
