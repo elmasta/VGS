@@ -2,15 +2,15 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 
-def get_adminpic_path(filename):
+def get_adminpic_path(instance, filename):
     """Used for the admin to save pictures on the site"""
 
-    return os.path.join('admin_picture', filename)
+    return os.path.join("collection/admin_picture", filename)
 
 def get_userpic_path(instance, filename):
     """Used for any registered user to save pictures on the site"""
 
-    return os.path.join('user_picture', str(instance.id), filename)
+    return os.path.join("collection/user_picture", str(instance.id), filename)
 
 class Condition(models.IntegerChoices):
 
