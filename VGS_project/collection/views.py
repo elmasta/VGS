@@ -1,8 +1,8 @@
 from collection.classes import *
-from collection.forms import UserCreationForm, ParagraphErrorList
+from collection.forms import UserCreationForm, UserLoginForm, ParagraphErrorList
 from collection.tokens import account_activation_token
 from django.http import HttpResponse
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -18,7 +18,28 @@ def index(request):
 
 def login_page(request):
 
-    return render(request, "collection/login.html")
+    context = {}
+    if request.method == "POST":
+        form = UserLoginForm(request.POST, error_class=ParagraphErrorList)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            if User.objects.filter(username=username).exists():
+                user = authenticate(username=username,
+                                    password=password)
+                if user is not None:
+                    login(request, user)
+                    return render(request, "collection/index.html")
+                else:
+                    form = UserLoginForm()
+            else:
+                context['errors'] = form.errors.items()
+        else:
+            context['errors'] = form.errors.items()
+    else:
+        form = UserLoginForm()
+    context["form"] = form
+    return render(request, "collection/login.html", context)
 
 def register_page(request):
 
@@ -77,4 +98,6 @@ def activate(request, uidb64, token):
     else:
         return HttpResponse('Activation link is invalid!')
 
+def profile_page(request):
 
+    return render(request, "collection/profile.html")
