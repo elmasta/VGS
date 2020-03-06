@@ -133,9 +133,7 @@ def profile_page(request):
                     avatar = UserData.objects.get(user=request.user)
                     avatar.profil_picture = new_avatar
                     avatar.save()
-                    print(2)
                 else:
-                    print(1)
                     avatar = UserData(profil_picture=new_avatar, user=request.user)
                     avatar.save()
             user_pic = UserData.objects.get(user=request.user)
@@ -147,3 +145,16 @@ def profile_page(request):
         return render(request, "collection/profile.html", context)
     else:
         return login_page(request)
+
+def add_game(request):
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            pass
+        else:
+            context = request.session['context']
+            form = GameCreationForm()
+            context["form"] = form
+            return render(request, "collection/add_item.html", context)
+    else:
+        return return_index(request, render)

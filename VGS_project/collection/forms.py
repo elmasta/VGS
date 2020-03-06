@@ -1,4 +1,4 @@
-from collection.models import UserData
+from collection.models import UserData, UserOwnedGame
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django import forms
@@ -17,8 +17,10 @@ class UserCreationForm(forms.ModelForm):
 
 class UserLoginForm(forms.Form):
 
-    username = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}))
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        "class": "form-control"}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        "class": "form-control"}))
 
 class ChangeAvatarForm(forms.ModelForm):
 
@@ -26,7 +28,63 @@ class ChangeAvatarForm(forms.ModelForm):
         model = UserData
         fields = ["profil_picture"]
         widgets = {
-            "profil_picture": forms.FileInput(attrs={"class": "form-control"}),
+            "profil_picture": forms.FileInput(attrs={
+                "class": "form-control"}),
+        }
+
+class GameCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = UserOwnedGame
+        fields = ["game_id", "game_name", "plateform_id", "compilation",
+                  "physical", "picture", "box_condition", "covers_condition",
+                  "manual_condition", "game_condition", "condition_precision",
+                  "rating", "rating_precision", "never_played",
+                  "completion_status", "completion_precision",
+                  "achievements_earned", "achievements_to_be_earned",
+                  "owning_status"]
+        widgets = {
+            "game_id": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "game_name": forms.TextInput(attrs={"class": "form-control"}),
+            "plateform_id": forms.Select(attrs={"class": "form-control"}),
+            "compilation": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "physical": forms.CheckboxInput(attrs={"class": "form-control"}),
+            "picture": forms.FileInput(attrs={"class": "form-control"}),
+            "box_condition": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "covers_condition": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "manual_condition": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "game_condition": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "condition_precision": forms.TextInput(attrs={
+                "class": "form-control", "required" : "False"}),
+            "rating": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune",
+                "required" : "False"}),
+            "rating_precision": forms.TextInput(attrs={
+                "class": "form-control", "required" : "False"}),
+            "never_played": forms.Select(attrs={
+                "class": "form-control", "initial": "False",}),
+            "completion_status": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune"}),
+            "completion_precision": forms.TextInput(attrs={
+                "class": "form-control", "required" : "False"}),
+            "achievements_earned": forms.NumberInput(attrs={
+                "class": "form-control", "required" : "False"}),
+            "achievements_to_be_earned": forms.NumberInput(attrs={
+                "class": "form-control", "required" : "False"}),
+            "owning_status": forms.Select(attrs={
+                "class": "form-control", "initial": "Aucune"}),
         }
 
 class ParagraphErrorList(ErrorList):

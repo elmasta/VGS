@@ -1,0 +1,27 @@
+{% extends 'collection/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xl-8 col-lg-7">
+      <div class="card shadow mb-4">
+        <!-- Card Body -->
+        <form class="user" method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="save btn btn-default">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="{% static 'collection/js/custom.js' %}"></script>
+<!-- /.container-fluid -->
+{% endblock %}

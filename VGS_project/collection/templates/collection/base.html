@@ -153,7 +153,7 @@
             <!-- Nav Item - Add games -->
             {% if request.user.is_authenticated %}
               <li class="nav-item mx-1">
-                <a class="nav-link" href="AddGame.html">
+                <a class="nav-link" href="{% url 'add_game' %}">
                   <span class="text-gray-600">Ajouter un jeu</span>
                 </a>
               </li>

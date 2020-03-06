@@ -31,6 +31,20 @@ class Owning(models.IntegerChoices):
     ABONEMENT = 5
     AUTRE = 6
 
+class Rating(models.IntegerChoices):
+
+    ZERO = 1
+    UN = 2
+    DEUX = 3
+    TROIS = 4
+    QUATRE = 5
+    CINQ = 6
+    SIX = 7
+    SEPT = 8
+    HUIT = 9
+    NEUF = 10
+    DIX = 11
+
 
 class UserData(models.Model):
 
@@ -45,6 +59,10 @@ def submission_delete(sender, instance, **kwargs):
     instance.file.delete(False)
 
 class Plateform(models.Model):
+
+    def __str__(self):
+
+        return self.name + " - region " + str(self.region)
 
     name = models.CharField(max_length=100)
     picture = models.ImageField(upload_to=get_adminpic_path)
@@ -90,6 +108,14 @@ class PlateformAddon(models.Model):
 
 class Compilation(models.Model):
 
+    class Meta:
+
+        ordering = ('name',)
+
+    def __str__(self):
+
+        return self.name
+
     name = models.CharField(max_length=100)
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path)
@@ -98,11 +124,19 @@ class Compilation(models.Model):
 
 class Games(models.Model):
 
+    class Meta:
+
+        ordering = ('name',)
+
+    def __str__(self):
+
+        return self.name + " - " + str(self.compilation) + " - " + str(self.plateform)
+
     name = models.CharField(max_length=100)
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path)
-    compilation = models.ManyToManyField(Compilation, blank=True,
-                                         related_name="games_id")
+    compilation = models.ForeignKey(Compilation, blank=True, null=True,
+                                    on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -150,8 +184,8 @@ class UserOwnedGame(models.Model):
     game_name = models.CharField(max_length=200)
     plateform_id = models.ForeignKey(Plateform, blank=True, null=True,
                                      on_delete=models.CASCADE)
-    compilation = models.ManyToManyField(UserOwnedCompilation, blank=True,
-                                         related_name="userownedgame_id")
+    compilation = models.ForeignKey(Compilation, blank=True, null=True,
+                                    on_delete=models.CASCADE)
     physical = models.BooleanField()
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
                                 null=True)
@@ -164,7 +198,8 @@ class UserOwnedGame(models.Model):
     game_condition = models.IntegerField(choices=Condition.choices,
                                          blank=True, null=True)
     condition_precision = models.TextField(blank=True, null=True)
-    rating = models.IntegerField(blank=True, null=True)
+    rating = models.IntegerField(choices=Rating.choices,
+                                 blank=True, null=True)
     rating_precision = models.TextField(blank=True, null=True)
     never_played = models.BooleanField()
     class Completion(models.IntegerChoices):
@@ -202,7 +237,8 @@ class UserOwnedGameDLC(models.Model):
     gamedlc_condition = models.IntegerField(choices=Condition.choices,
                                             blank=True, null=True)
     condition_precision = models.TextField(blank=True, null=True)
-    rating = models.IntegerField(blank=True, null=True)
+    rating = models.IntegerField(choices=Rating.choices,
+                                 blank=True, null=True)
     rating_precision = models.TextField(blank=True, null=True)
     owning_status = models.IntegerField(choices=Owning.choices)
     created_at = models.DateTimeField(auto_now_add=True)
