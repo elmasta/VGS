@@ -1,6 +1,7 @@
 from collection.classes import *
-from collection.forms import UserCreationForm, UserLoginForm, ParagraphErrorList
+from collection.forms import *
 from collection.tokens import account_activation_token
+from collection.models import UserData
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
@@ -11,10 +12,11 @@ from django.shortcuts import render
 from django.template import loader
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
+from PIL import Image
 
 def index(request):
 
-    return render(request, "collection/index.html")
+    return return_index(request, render)
 
 def login_page(request):
 
@@ -29,13 +31,26 @@ def login_page(request):
                                     password=password)
                 if user is not None:
                     login(request, user)
-                    return render(request, "collection/index.html")
+                    request.session['context'] = {
+                        "username": request.user.username,
+                        "email": request.user.email,
+                        "name": request.user.first_name,
+                    }
+                    picture = "https://source.unsplash.com/QAB-WJcbgJk/60x60"
+                    #utilisé 2 fois à refactoriser
+                    if UserData.objects.filter(user=request.user.id).exists():
+                        user_pic = UserData.objects.get(user=request.user.id)
+                        picture = user_pic.profil_picture
+                        request.session['context']["profil_pic"] = picture.photo.path
+                    else:
+                        request.session['context']["profil_pic"] = picture
+                    return return_index(request, render)
                 else:
                     form = UserLoginForm()
             else:
-                context['errors'] = form.errors.items()
+                context["errors"] = form.errors.items()
         else:
-            context['errors'] = form.errors.items()
+            context["errors"] = form.errors.items()
     else:
         form = UserLoginForm()
     context["form"] = form
@@ -52,7 +67,9 @@ def register_page(request):
             first_name = form.cleaned_data["first_name"]
             password = form.cleaned_data["password"]
             user = User.objects.filter(email=email)
-            if password == request.POST.get('CheckPassword') and not user.exists():
+            if password == request.POST.get("CheckPassword") and\
+                not user.exists():
+                print("test")
                 User.objects.create_user(
                     email=email,
                     username=username,
@@ -62,25 +79,26 @@ def register_page(request):
                 user.is_active = False
                 current_site = get_current_site(request)
                 mail_subject = "Activez votre compte VGS."
-                message = render_to_string('collection/acc_active_email.html', {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid':urlsafe_base64_encode(force_bytes(user.id)),
-                    'token':account_activation_token.make_token(user)
-                })
+                message = render_to_string(
+                    "collection/acc_active_email.html", {
+                        "user": user,
+                        "domain": current_site.domain,
+                        "uid": urlsafe_base64_encode(force_bytes(user.id)),
+                        "token":account_activation_token.make_token(user)
+                    })
                 to_email = EmailMessage(
                     mail_subject, message, to=[email]
                 )
                 to_email.send()
-                return render(request, "collection/login.html")
+                return login_page(request)
             else:
-                context['errors'] = form.errors.items()
+                context["inv_errors"] = "Email déjà utilisé"
         else:
-            context['errors'] = form.errors.items()
+            context["form_errors"] = form.errors.items()
     else:
         form = UserCreationForm()
     context["form"] = form
-    return render(request, 'collection/register.html', context)
+    return render(request, "collection/register.html", context)
 
 def activate(request, uidb64, token):
 
@@ -94,10 +112,38 @@ def activate(request, uidb64, token):
         user.save()
         login(request, user)
         # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        return HttpResponse("Thank you for your email confirmation. Now you can login your account.")
     else:
-        return HttpResponse('Activation link is invalid!')
+        return HttpResponse("Activation link is invalid!")
+
+def user_logout(request):
+
+    logout(request)
+    return return_index(request, render)
 
 def profile_page(request):
 
-    return render(request, "collection/profile.html")
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = ChangeAvatarForm(request.POST, request.FILES)
+            if form.is_valid():
+                new_avatar = form.cleaned_data["profil_picture"]
+                #utilisé deux fois à refactoriser
+                if UserData.objects.filter(user=request.user).exists():
+                    avatar = UserData.objects.get(user=request.user)
+                    avatar.profil_picture = new_avatar
+                    avatar.save()
+                    print(2)
+                else:
+                    print(1)
+                    avatar = UserData(profil_picture=new_avatar, user=request.user)
+                    avatar.save()
+            user_pic = UserData.objects.get(user=request.user)
+            request.session['context']["profil_pic"] = user_pic.profil_picture.path
+        context = request.session['context']
+        form = ChangeAvatarForm()
+        context["form"] = form
+        context["date_joined"] = request.user.date_joined
+        return render(request, "collection/profile.html", context)
+    else:
+        return login_page(request)

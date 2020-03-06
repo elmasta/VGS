@@ -73,7 +73,7 @@
                 </div>
                 <button type="submit" class="btn btn-success">S'enregistrer</button>
               </form>
-              {% if errors %}
+              {% if form_errors %}
                 <div>
                   {% for key, error in errors %}
                     {% autoescape off %}
@@ -81,6 +81,8 @@
                     {% endautoescape %}
                   {% endfor %}
                 </div>
+              {% elif inv_errors %}
+                <div>{{ inv_errors }}</div>
               {% endif %}
               <hr>
               <div class="text-center">

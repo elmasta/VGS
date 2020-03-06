@@ -3,3 +3,5 @@ VGS_project/VGS_project/__pycache__/
 VGS_project/collection/__pycache__/
 VGS_project/collection/migrations/__pycache__/
 VGS_project/__pycache__/
+VGS_project/collection/user_picture/
+VGS_project/collection/admin_picture/

@@ -1,6 +1,7 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
+from django.dispatch import receiver
 
 def get_adminpic_path(instance, filename):
     """Used for the admin to save pictures on the site"""
@@ -10,7 +11,7 @@ def get_adminpic_path(instance, filename):
 def get_userpic_path(instance, filename):
     """Used for any registered user to save pictures on the site"""
 
-    return os.path.join("collection/user_picture", str(instance.id), filename)
+    return os.path.join("collection/user_picture", str(instance.user.id), filename)
 
 class Condition(models.IntegerChoices):
 
@@ -38,6 +39,10 @@ class UserData(models.Model):
                                        null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+@receiver(models.signals.post_delete, sender=UserData)
+def submission_delete(sender, instance, **kwargs):
+    instance.file.delete(False)
 
 class Plateform(models.Model):
 
@@ -86,7 +91,7 @@ class PlateformAddon(models.Model):
 class Compilation(models.Model):
 
     name = models.CharField(max_length=100)
-    plateform = models.ForeignKey(SubPlateform, on_delete=models.CASCADE)
+    plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -94,7 +99,7 @@ class Compilation(models.Model):
 class Games(models.Model):
 
     name = models.CharField(max_length=100)
-    plateform = models.ForeignKey(SubPlateform, on_delete=models.CASCADE)
+    plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path)
     compilation = models.ManyToManyField(Compilation, blank=True,
                                          related_name="games_id")

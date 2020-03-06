@@ -1,6 +1,6 @@
 from django.contrib import admin
 from collection.models import Plateform, SubPlateform, PlateformAddon,\
-    Compilation, Games, GameDLC
+    Compilation, Games, GameDLC, UserData
 
 @admin.register(Plateform)
 class PlateformAdmin(admin.ModelAdmin):
@@ -24,4 +24,9 @@ class GamesAdmin(admin.ModelAdmin):
 
 @admin.register(GameDLC)
 class GameDLCAdmin(admin.ModelAdmin):
+    pass
+
+#to be deleted after final testing
+@admin.register(UserData)
+class UserDataAdmin(admin.ModelAdmin):
     pass
