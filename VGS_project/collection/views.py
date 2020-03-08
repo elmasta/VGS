@@ -29,7 +29,7 @@ def login_page(request):
             if User.objects.filter(username=username).exists():
                 user = authenticate(username=username,
                                     password=password)
-                if user is not None:
+                if user is not None and user.is_active:
                     login(request, user)
                     request.session['context'] = {
                         "username": request.user.username,
@@ -40,12 +40,12 @@ def login_page(request):
                     #utilisé 2 fois à refactoriser
                     if UserData.objects.filter(user=request.user.id).exists():
                         user_pic = UserData.objects.get(user=request.user.id)
-                        picture = user_pic.profil_picture
-                        request.session['context']["profil_pic"] = picture.photo.path
+                        request.session['context']["profil_pic"] = user_pic.profil_picture.path
                     else:
                         request.session['context']["profil_pic"] = picture
                     return return_index(request, render)
                 else:
+                    #todo error message
                     form = UserLoginForm()
             else:
                 context["errors"] = form.errors.items()
@@ -69,14 +69,13 @@ def register_page(request):
             user = User.objects.filter(email=email)
             if password == request.POST.get("CheckPassword") and\
                 not user.exists():
-                print("test")
                 User.objects.create_user(
                     email=email,
                     username=username,
                     password=password,
-                    first_name=first_name)
+                    first_name=first_name,
+                    is_active=False)
                 user = User.objects.get(email=email)
-                user.is_active = False
                 current_site = get_current_site(request)
                 mail_subject = "Activez votre compte VGS."
                 message = render_to_string(
@@ -90,7 +89,7 @@ def register_page(request):
                     mail_subject, message, to=[email]
                 )
                 to_email.send()
-                return login_page(request)
+                return return_index(request, render)
             else:
                 context["inv_errors"] = "Email déjà utilisé"
         else:
@@ -105,12 +104,14 @@ def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(id=uid)
+        print("test")
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
+        print("test2")
+    print(account_activation_token.check_token(user, token))
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        login(request, user)
         # return redirect('home')
         return HttpResponse("Thank you for your email confirmation. Now you can login your account.")
     else:
@@ -156,5 +157,16 @@ def add_game(request):
             form = GameCreationForm()
             context["form"] = form
             return render(request, "collection/add_item.html", context)
+    else:
+        return return_index(request, render)
+
+def user_collection(request):
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            pass
+        else:
+            return render(request, "collection/collection.html",
+                          request.session['context'])
     else:
         return return_index(request, render)

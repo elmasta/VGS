@@ -2,49 +2,37 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy
 
 def get_adminpic_path(instance, filename):
     """Used for the admin to save pictures on the site"""
 
-    return os.path.join("collection/admin_picture", filename)
+    return os.path.join("admin_picture", filename)
 
 def get_userpic_path(instance, filename):
     """Used for any registered user to save pictures on the site"""
 
-    return os.path.join("collection/user_picture", str(instance.user.id), filename)
+    return os.path.join("user_picture", str(instance.user.id), filename)
 
 class Condition(models.IntegerChoices):
 
-    MANQUANT = 1
-    MAUVAIS = 2
-    MOYEN = 3
-    BON = 4
-    TRES_BON = 5
-    NEUF = 6
+    MANQUANT = 1, gettext_lazy("Manquant")
+    MAUVAIS = 2, gettext_lazy("Mauvais")
+    MOYEN = 3, gettext_lazy("Moyen")
+    BON = 4, gettext_lazy("Bon")
+    TRES_BON = 5, gettext_lazy("Très Bon")
+    NEUF = 6, gettext_lazy("Neuf")
 
 class Owning(models.IntegerChoices):
 
-    POSSEDE = 1
-    VENDU = 2
-    DONNEE = 3
-    PRET_DUN_AMI = 4
-    ABONEMENT = 5
-    AUTRE = 6
+    POSSEDE = 1, gettext_lazy("Possédé")
+    VENDU = 2, gettext_lazy("Vendu")
+    DONNE = 3, gettext_lazy("Donné")
+    PRET_D_UN_AMI = 4, gettext_lazy("Pret d'un ami")
+    ABONNEMENT = 5, gettext_lazy("Abonnement")
+    AUTRE = 6, gettext_lazy("Autre")
 
-class Rating(models.IntegerChoices):
-
-    ZERO = 1
-    UN = 2
-    DEUX = 3
-    TROIS = 4
-    QUATRE = 5
-    CINQ = 6
-    SIX = 7
-    SEPT = 8
-    HUIT = 9
-    NEUF = 10
-    DIX = 11
-
+RATING = models.IntegerChoices("RATING", "0 1 2 3 4 5 6 7 8 9 10")
 
 class UserData(models.Model):
 
@@ -56,7 +44,7 @@ class UserData(models.Model):
 
 @receiver(models.signals.post_delete, sender=UserData)
 def submission_delete(sender, instance, **kwargs):
-    instance.file.delete(False)
+    instance.profil_picture.delete(False)
 
 class Plateform(models.Model):
 
@@ -198,7 +186,7 @@ class UserOwnedGame(models.Model):
     game_condition = models.IntegerField(choices=Condition.choices,
                                          blank=True, null=True)
     condition_precision = models.TextField(blank=True, null=True)
-    rating = models.IntegerField(choices=Rating.choices,
+    rating = models.IntegerField(choices=RATING.choices,
                                  blank=True, null=True)
     rating_precision = models.TextField(blank=True, null=True)
     never_played = models.BooleanField()
@@ -237,7 +225,7 @@ class UserOwnedGameDLC(models.Model):
     gamedlc_condition = models.IntegerField(choices=Condition.choices,
                                             blank=True, null=True)
     condition_precision = models.TextField(blank=True, null=True)
-    rating = models.IntegerField(choices=Rating.choices,
+    rating = models.IntegerField(choices=RATING.choices,
                                  blank=True, null=True)
     rating_precision = models.TextField(blank=True, null=True)
     owning_status = models.IntegerField(choices=Owning.choices)
