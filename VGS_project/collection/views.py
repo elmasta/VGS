@@ -131,6 +131,7 @@ def profile_page(request):
                 new_avatar = form.cleaned_data["profil_picture"]
                 #utilisé deux fois à refactoriser
                 if UserData.objects.filter(user=request.user).exists():
+                    #todo del old picture
                     avatar = UserData.objects.get(user=request.user)
                     avatar.profil_picture = new_avatar
                     avatar.save()
@@ -147,16 +148,76 @@ def profile_page(request):
     else:
         return login_page(request)
 
+def add_item(request):
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            #todo search compilation/game form treatment
+            #form = GameCreationForm(request.POST, request.FILES)
+            #if form.is_valid():
+            return return_index(request, render)
+        else:
+            # todo add search compilation/game form
+            context = request.session['context']
+            return render(request, "collection/add_item.html", context)
+    else:
+        return return_index(request, render)
+
 def add_game(request):
 
     if request.user.is_authenticated:
         if request.method == "POST":
-            pass
+            form = GameCreationForm(request.POST, request.FILES)
+            if form.is_valid():
+                game_id = form.cleaned_data["game_id"]
+                game_name = form.cleaned_data["game_name"]
+                plateform_id = form.cleaned_data["plateform_id"]
+                compilation = form.cleaned_data["compilation"]
+                physical = form.cleaned_data["physical"]
+                picture = form.cleaned_data["picture"]
+                box_condition = form.cleaned_data["box_condition"]
+                covers_condition = form.cleaned_data["covers_condition"]
+                manual_condition = form.cleaned_data["manual_condition"]
+                game_condition = form.cleaned_data["game_condition"]
+                condition_precision = form.cleaned_data["condition_precision"]
+                rating = form.cleaned_data["rating"]
+                rating_precision = form.cleaned_data["rating_precision"]
+                never_played = form.cleaned_data["never_played"]
+                completion_status = form.cleaned_data["completion_status"]
+                completion_precision = form.cleaned_data["completion_precision"]
+                achievements_earned = form.cleaned_data["achievements_earned"]
+                achievements_to_be_earned = form.cleaned_data["achievements_to_be_earned"]
+                owning_status = form.cleaned_data["owning_status"]
+                new_game = UserOwnedGame(
+                    user=request.user,
+                    game_id=game_id,
+                    game_name=game_name,
+                    plateform_id=plateform_id,
+                    compilation=compilation,
+                    physical=physical,
+                    picture=picture,
+                    box_condition=box_condition,
+                    covers_condition=covers_condition,
+                    manual_condition=manual_condition,
+                    game_condition=game_condition,
+                    condition_precision=condition_precision,
+                    rating=rating,
+                    rating_precision=rating_precision,
+                    never_played=never_played,
+                    completion_status=completion_status,
+                    completion_precision=completion_precision,
+                    achievements_earned=achievements_earned,
+                    achievements_to_be_earned=achievements_to_be_earned,
+                    owning_status=owning_status
+                    )
+                new_game.save()
+                #todo return to game page
+                return return_index(request, render)
         else:
             context = request.session['context']
             form = GameCreationForm()
             context["form"] = form
-            return render(request, "collection/add_item.html", context)
+            return render(request, "collection/add_game.html", context)
     else:
         return return_index(request, render)
 

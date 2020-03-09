@@ -80,46 +80,39 @@ class GameCreationForm(forms.ModelForm):
         }
         widgets = {
             "game_id": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "game_name": forms.TextInput(attrs={"class": "form-control"}),
             "plateform_id": forms.Select(attrs={"class": "form-control"}),
             "compilation": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "physical": forms.CheckboxInput(attrs={"class": "form-control"}),
-            "picture": forms.FileInput(attrs={"class": "form-control"}),
+            "picture": forms.FileInput(attrs={
+                "class": "form-control", "required": False}),
             "box_condition": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "covers_condition": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "manual_condition": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "game_condition": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "condition_precision": forms.TextInput(attrs={
-                "class": "form-control", "required": "False"}),
+                "class": "form-control", "required": False}),
             "rating": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune",
-                "required": "False"}),
+                "class": "form-control", "required": False}),
             "rating_precision": forms.TextInput(attrs={
-                "class": "form-control", "required": "False"}),
-            "never_played": forms.Select(attrs={
-                "class": "form-control", "initial": "False",}),
+                "class": "form-control", "required": False}),
+            "never_played": forms.CheckboxInput(attrs={
+                "class": "form-control"}),
             "completion_status": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune"}),
+                "class": "form-control"}),
             "completion_precision": forms.TextInput(attrs={
-                "class": "form-control", "required": "False"}),
+                "class": "form-control", "required": False}),
             "achievements_earned": forms.NumberInput(attrs={
-                "class": "form-control", "required": "False"}),
+                "class": "form-control", "required": False}),
             "achievements_to_be_earned": forms.NumberInput(attrs={
-                "class": "form-control", "required": "False"}),
-            "owning_status": forms.Select(attrs={
-                "class": "form-control", "initial": "Aucune"}),
+                "class": "form-control", "required": False}),
+            "owning_status": forms.Select(attrs={"class": "form-control"}),
         }
 
 class ParagraphErrorList(ErrorList):

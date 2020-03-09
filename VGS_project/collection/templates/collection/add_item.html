@@ -7,21 +7,100 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
   <div class="row">
-    <div class="col-xl-8 col-lg-7">
+    <div class="col-xl-2 col-lg-2"></div>
+    <div class="col-xl-8 col-lg-8">
       <div class="card shadow mb-4">
         <!-- Card Body -->
-        <form class="user" method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="save btn btn-default">Save</button>
-        </form>
+        <div class="card-body">
+          <div class="align-items-center justify-content-center text-center">
+            <h4 class="text-uppercase font-weight-bold mt-4">Que voulez vous ajouter?</h4>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1 mb-2"></div>
+            <div class="col-xl-1 col-lg-1 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <button class="btn btn-primary" id="game">Jeu</button>
+              </div>
+            </div>
+            <div class="col-xl-2 col-lg-2 mb-2"></div>
+            <div class="col-xl-1 col-lg-1 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <button class="btn btn-info" id="compilation">Compilation</button>
+              </div>
+            </div>
+            <div class="col-xl-2 col-lg-2 mb-2"></div>
+            <div class="col-xl-1 col-lg-1 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <a class="btn btn-success" href="#">Plateforme</a>
+              </div>
+            </div>
+            <div class="col-xl-2 col-lg-2 mb-2"></div>
+            <div class="col-xl-1 col-lg-1 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <a class="btn btn-warning" href="#">Accesoire</a>
+              </div>
+            </div>
+          </div>
+          <div class="align-items-center justify-content-center text-center" id="ga">
+            <h4 class="text-uppercase font-weight-bold mt-4">Voulez vous ratacher ce jeu à un jeu existant dans notre base de données?</h4>
+          </div>
+          <div class="row mt-4" id="ga">
+            <div class="col-xl-4 col-lg-1 mb-2"></div>
+            <div class="col-xl-1 col-lg-1 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <a class="btn btn-danger" href="{% url 'add_game' %}">Non</a>
+              </div>
+            </div>
+            <div class="col-xl-2 col-lg-2 mb-2"></div>
+            <div class="col-xl-3 col-lg-2 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <form class="form-inline">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Recherche de jeux" aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="align-items-center justify-content-center text-center" id="comp">
+            <h4 class="text-uppercase font-weight-bold mt-4">Voulez vous ratacher cette compilation à une compilation existant dans notre base de données?</h4>
+          </div>
+          <div class="row mt-4" id="comp">
+            <div class="col-xl-4 col-lg-1 mb-2"></div>
+            <div class="col-xl-1 col-lg-1 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <button class="btn btn-danger">Non</button>
+              </div>
+            </div>
+            <div class="col-xl-2 col-lg-2 mb-2"></div>
+            <div class="col-xl-3 col-lg-2 mb-2">
+              <div class="align-items-center justify-content-center text-center">
+                <form class="form-inline">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Recherche de compilation" aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-</div>
 
+</div>
+</div>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="{% static 'collection/js/custom.js' %}"></script>
+<script src="{% static 'collection/js/add_game.js' %}"></script>
 <!-- /.container-fluid -->
 {% endblock %}

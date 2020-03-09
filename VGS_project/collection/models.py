@@ -48,15 +48,33 @@ def submission_delete(sender, instance, **kwargs):
 
 class Plateform(models.Model):
 
+    class Meta:
+
+        ordering = ('name',)
+
     def __str__(self):
 
-        return self.name + " - region " + str(self.region)
+        elem = [
+            "Europe",
+            "Amérique du Nord",
+            "Japon",
+            "Amérique central",
+            "Emérique du Sud",
+            "Asie",
+            "Russie",
+            "Moyen Orient"
+            "Afrique"
+        ]
+        for num in range(len(elem)):
+            if self.region == (num + 1):
+                ret_region = elem[self.region - 1]
+        return self.name + " - région " + str(ret_region)
 
     name = models.CharField(max_length=100)
     picture = models.ImageField(upload_to=get_adminpic_path)
     class Region(models.IntegerChoices):
 
-        EUROPE = 1
+        EUROPE = 1, gettext_lazy("Europe")
         AMERIQUE_DU_NORD = 2
         JAPON = 3
         AMERIQUE_CENTRAL = 4
@@ -65,6 +83,7 @@ class Plateform(models.Model):
         RUSSIE = 7
         MOYEN_ORIENT = 8
         AFRIQUE = 9
+
     region = models.IntegerField(choices=Region.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -80,6 +99,10 @@ class CollectionPicture(models.Model):
 
 class SubPlateform(models.Model):
 
+    class Meta:
+
+        ordering = ('name',)
+
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     picture = models.ImageField(upload_to=get_adminpic_path)
@@ -87,6 +110,10 @@ class SubPlateform(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class PlateformAddon(models.Model):
+
+    class Meta:
+
+        ordering = ('name',)
 
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -118,7 +145,10 @@ class Games(models.Model):
 
     def __str__(self):
 
-        return self.name + " - " + str(self.compilation) + " - " + str(self.plateform)
+        if not self.compilation:
+            return self.name + " - " + str(self.plateform)
+        else:
+            return self.name + " - " + str(self.compilation) + " - " + str(self.plateform)
 
     name = models.CharField(max_length=100)
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
@@ -197,6 +227,7 @@ class UserOwnedGame(models.Model):
         FINI_CENT_POUR_CENT = 3
         SANS_FIN = 4
         ABANDONNE = 5
+
     completion_status = models.IntegerField(choices=Completion.choices)
     completion_precision = models.TextField(blank=True, null=True)
     achievements_earned = models.IntegerField(blank=True, null=True)
