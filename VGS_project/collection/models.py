@@ -62,27 +62,27 @@ class Plateform(models.Model):
             "Emérique du Sud",
             "Asie",
             "Russie",
-            "Moyen Orient"
+            "Moyen Orient",
             "Afrique"
         ]
         for num in range(len(elem)):
             if self.region == (num + 1):
                 ret_region = elem[self.region - 1]
-        return self.name + " - région " + str(ret_region)
+        return self.name + " - " + str(ret_region)
 
     name = models.CharField(max_length=100)
     picture = models.ImageField(upload_to=get_adminpic_path)
     class Region(models.IntegerChoices):
 
         EUROPE = 1, gettext_lazy("Europe")
-        AMERIQUE_DU_NORD = 2
-        JAPON = 3
-        AMERIQUE_CENTRAL = 4
-        AMERIQUE_DU_SUD = 5
-        ASIE = 6
-        RUSSIE = 7
-        MOYEN_ORIENT = 8
-        AFRIQUE = 9
+        AMERIQUE_DU_NORD = 2, gettext_lazy("Amérique du Nord")
+        JAPON = 3, gettext_lazy("Japon")
+        AMERIQUE_CENTRAL = 4, gettext_lazy("Amérique Central")
+        AMERIQUE_DU_SUD = 5, gettext_lazy("Amérique du Sud")
+        ASIE = 6, gettext_lazy("Asie")
+        RUSSIE = 7, gettext_lazy("Russie")
+        MOYEN_ORIENT = 8, gettext_lazy("Moyen Orient")
+        AFRIQUE = 9, gettext_lazy("Afrique")
 
     region = models.IntegerField(choices=Region.choices)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -94,6 +94,7 @@ class CollectionPicture(models.Model):
     collection_picture = models.ImageField(upload_to=get_userpic_path,
                                            blank=True,
                                            null=True)
+    private = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -129,7 +130,7 @@ class Compilation(models.Model):
 
     def __str__(self):
 
-        return self.name
+        return self.name + " - " + str(self.plateform)
 
     name = models.CharField(max_length=100)
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
@@ -145,20 +146,23 @@ class Games(models.Model):
 
     def __str__(self):
 
-        if not self.compilation:
-            return self.name + " - " + str(self.plateform)
-        else:
-            return self.name + " - " + str(self.compilation) + " - " + str(self.plateform)
+        return self.name + " - " + str(self.plateform)
 
     name = models.CharField(max_length=100)
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_adminpic_path)
-    compilation = models.ForeignKey(Compilation, blank=True, null=True,
-                                    on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 class GameDLC(models.Model):
+
+    class Meta:
+
+        ordering = ('name',)
+
+    def __str__(self):
+
+        return self.name + " - " + str(self.plateform)
 
     name = models.CharField(max_length=100)
     game = models.ForeignKey(Games, on_delete=models.CASCADE)
@@ -202,8 +206,8 @@ class UserOwnedGame(models.Model):
     game_name = models.CharField(max_length=200)
     plateform_id = models.ForeignKey(Plateform, blank=True, null=True,
                                      on_delete=models.CASCADE)
-    compilation = models.ForeignKey(Compilation, blank=True, null=True,
-                                    on_delete=models.CASCADE)
+    compilation = models.ForeignKey(UserOwnedCompilation, blank=True,
+                                    null=True, on_delete=models.CASCADE)
     physical = models.BooleanField()
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
                                 null=True)
@@ -222,11 +226,11 @@ class UserOwnedGame(models.Model):
     never_played = models.BooleanField()
     class Completion(models.IntegerChoices):
 
-        PAS_FINI = 1
-        FINI = 2
-        FINI_CENT_POUR_CENT = 3
-        SANS_FIN = 4
-        ABANDONNE = 5
+        PAS_FINI = 1, gettext_lazy("Pas fini")
+        FINI = 2, gettext_lazy("Fini")
+        FINI_CENT_POUR_CENT = 3, gettext_lazy("Fini à 100%")
+        SANS_FIN = 4, gettext_lazy("N'a pas de fin")
+        ABANDONNE = 5, gettext_lazy("Abandonné")
 
     completion_status = models.IntegerField(choices=Completion.choices)
     completion_precision = models.TextField(blank=True, null=True)
@@ -271,8 +275,6 @@ class UserOwnedSubPlateform(models.Model):
                                 null=True)
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
-    covers_condition = models.IntegerField(choices=Condition.choices,
-                                           blank=True, null=True)
     manual_condition = models.IntegerField(choices=Condition.choices,
                                            blank=True, null=True)
     subplateform_condition = models.IntegerField(choices=Condition.choices,
@@ -290,8 +292,6 @@ class UserOwnedPlateformAddon(models.Model):
                                 null=True)
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
-    covers_condition = models.IntegerField(choices=Condition.choices,
-                                           blank=True, null=True)
     manual_condition = models.IntegerField(choices=Condition.choices,
                                            blank=True, null=True)
     plateformaddon_condition = models.IntegerField(choices=Condition.choices,

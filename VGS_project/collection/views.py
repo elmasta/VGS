@@ -1,14 +1,14 @@
 from collection.classes import *
 from collection.forms import *
 from collection.tokens import account_activation_token
-from collection.models import UserData
+from collection.models import UserData, Games, Plateform
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.template import loader
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
@@ -151,15 +151,8 @@ def profile_page(request):
 def add_item(request):
 
     if request.user.is_authenticated:
-        if request.method == "POST":
-            #todo search compilation/game form treatment
-            #form = GameCreationForm(request.POST, request.FILES)
-            #if form.is_valid():
-            return return_index(request, render)
-        else:
-            # todo add search compilation/game form
-            context = request.session['context']
-            return render(request, "collection/add_item.html", context)
+        context = request.session['context']
+        return render(request, "collection/add_item.html", context)
     else:
         return return_index(request, render)
 
@@ -218,6 +211,17 @@ def add_game(request):
             form = GameCreationForm()
             context["form"] = form
             return render(request, "collection/add_game.html", context)
+    else:
+        return return_index(request, render)
+
+def add_comp(request):
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            pass
+        else:
+            return render(request, "collection/add_comp.html",
+                          request.session['context'])
     else:
         return return_index(request, render)
 

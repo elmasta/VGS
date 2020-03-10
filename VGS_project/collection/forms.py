@@ -1,4 +1,5 @@
-from collection.models import UserData, UserOwnedGame
+from collection.models import UserData, UserOwnedGame, Games, Compilation,\
+    UserOwnedCompilation
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django import forms
@@ -21,6 +22,36 @@ class UserLoginForm(forms.Form):
         "class": "form-control"}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         "class": "form-control"}))
+
+class SearchGameForm(forms.ModelForm):
+
+    class Meta:
+        model = Games
+        fields = ["name"]
+        labels = {"name": "Choisissez un jeu"}
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "class": "form-control",
+                "list": "games",
+                "placeholder": "Recherche de jeux",
+                "size": "200"
+            }),
+        }
+
+class SearchCompilationForm(forms.ModelForm):
+
+    class Meta:
+        model = Compilation
+        fields = ["name"]
+        labels = {"name": "Choisissez une compilation"}
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "class": "form-control",
+                "list": "compil",
+                "placeholder": "Recherche de compilation",
+                "size": "200"
+            }),
+        }
 
 class ChangeAvatarForm(forms.ModelForm):
 
@@ -57,32 +88,12 @@ class GameCreationForm(forms.ModelForm):
             "achievements_to_be_earned",
             "owning_status"
         ]
-        labels = {
-            "game_id": "Choisissez un jeu",
-            "game_name": "Nom du jeu",
-            "plateform_id": "Plateforme",
-            "compilation": "Compilation",
-            "physical": "Jeu physique?",
-            "picture": "Image",
-            "box_condition": "État de la boite",
-            "covers_condition": "État des jaquettes",
-            "manual_condition": "État du Manuel",
-            "game_condition": "État du Jeu",
-            "condition_precision": "Détail sur l'état de l'ensemble",
-            "rating": "Note",
-            "rating_precision": "Review",
-            "never_played": "Déjà joué?",
-            "completion_status": "Fini?",
-            "completion_precision": "Où en êtes vous dans le jeu?",
-            "achievements_earned": "Nombre de succès obtenus",
-            "achievements_to_be_earned": "Nombre de succès total du jeu",
-            "owning_status": "Status de possession"
-        }
         widgets = {
             "game_id": forms.Select(attrs={
                 "class": "form-control", "required": False}),
             "game_name": forms.TextInput(attrs={"class": "form-control"}),
-            "plateform_id": forms.Select(attrs={"class": "form-control"}),
+            "plateform_id": forms.Select(attrs={
+                "class": "form-control", "required": False}),
             "compilation": forms.Select(attrs={
                 "class": "form-control", "required": False}),
             "physical": forms.CheckboxInput(attrs={"class": "form-control"}),
@@ -97,11 +108,13 @@ class GameCreationForm(forms.ModelForm):
             "game_condition": forms.Select(attrs={
                 "class": "form-control", "required": False}),
             "condition_precision": forms.TextInput(attrs={
-                "class": "form-control", "required": False}),
+                "class": "form-control h-100 d-inline-block",
+                "required": False}),
             "rating": forms.Select(attrs={
                 "class": "form-control", "required": False}),
             "rating_precision": forms.TextInput(attrs={
-                "class": "form-control", "required": False}),
+                "class": "form-control h-100 d-inline-block",
+                "required": False}),
             "never_played": forms.CheckboxInput(attrs={
                 "class": "form-control"}),
             "completion_status": forms.Select(attrs={
@@ -112,6 +125,47 @@ class GameCreationForm(forms.ModelForm):
                 "class": "form-control", "required": False}),
             "achievements_to_be_earned": forms.NumberInput(attrs={
                 "class": "form-control", "required": False}),
+            "owning_status": forms.Select(attrs={"class": "form-control"}),
+        }
+
+class DLCCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = UserOwnedCompilation
+        fields = [
+            "compilation_id",
+            "compilation_name",
+            "plateform_id",
+            "physical",
+            "picture",
+            "box_condition",
+            "covers_condition",
+            "manual_condition",
+            "game_condition",
+            "condition_precision",
+            "owning_status"
+        ]
+        widgets = {
+            "compilation_id": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "compilation_name": forms.TextInput(attrs={
+                "class": "form-control"}),
+            "plateform_id": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "physical": forms.CheckboxInput(attrs={"class": "form-control"}),
+            "picture": forms.FileInput(attrs={
+                "class": "form-control", "required": False}),
+            "box_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "covers_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "manual_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "game_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "condition_precision": forms.TextInput(attrs={
+                "class": "form-control h-100 d-inline-block",
+                "required": False}),
             "owning_status": forms.Select(attrs={"class": "form-control"}),
         }
 
