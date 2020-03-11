@@ -11,14 +11,32 @@
     <div class="col-xl-8 col-lg-8">
       <div class="card shadow mb-4">
         <!-- Card Body -->
+        <div class="row mt-4">
+          <div class="col-xl-1 col-lg-1"></div>
+          <div class="col-xl-9 col-lg-1">
+            <div class="align-items-center justify-content-center text-center">
+              <h4 class="text-uppercase font-weight-bold mt-4">Formulaire d'ajout de compilation</h4>
+            </div>
+          </div>
+        </div>
         <form class="user" method="post">
           {% csrf_token %}
           <div class="row mt-4">
             <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-9 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Choisissez une compilation</label>
+                {{ form.compilation_id }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif, sera relié à une compilation existante en base de données</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
-                <label class="control-label">Nom du jeu</label>
-                {{ form.game_name }}
+                <label class="control-label">Nom de la compilation</label>
+                {{ form.compilation_name }}
                 <i class="fas fa-sm mr-2 text-gray-500">Requis. 200 caractères maximum.</i>
               </div>
             </div>
@@ -26,7 +44,7 @@
               <div class="form-group ml-4">
                 <label class="control-label">Plateforme</label>
                 {{ form.plateform_id }}
-                <i class="fas fa-sm mr-2 text-gray-500">Requis</i>
+                <i class="fas fa-sm mr-2 text-gray-500">Requis ou sera ignoré si une compilation a été sélectionné.</i>
               </div>
             </div>
             <div class="col-xl-1 col-lg-1">
@@ -37,129 +55,74 @@
             </div>
           </div>
           <div class="row mt-4">
-            <div class="col-xl-4 col-lg-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-3 col-lg-4">
               <div class="form-group ml-4">
-                <label class="control-label">Compilation</label>
-                {{ form.compilation }}
+                <label class="control-label">Possédez le vous?</label>
+                {{ form.owning_status }}
+                <i class="fas fa-sm mr-2 text-gray-500">Requis</i>
               </div>
             </div>
+            <div class="col-xl-1 col-lg-1"></div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
                 <label class="control-label">Image</label>
                 {{ form.picture }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
           </div>
-
           <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
                 <label class="control-label">État de la boite</label>
                 {{ form.box_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
                 <label class="control-label">État des jaquettes</label>
                 {{ form.covers_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
           </div>
-
           <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
                 <label class="control-label">État du manuel</label>
                 {{ form.manual_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
-                <label class="control-label">État du jeu</label>
+                <label class="control-label">État de la compilation</label>
                 {{ form.game_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
           </div>
-
           <div class="row mt-4">
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-9 col-lg-4">
+              <div class="form-group ml-4" style="height: 100px">
                 <label class="control-label">Détail sur l'état de l'ensemble</label>
                 {{ form.condition_precision }}
-              </div>
-            </div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Note</label>
-                {{ form.rating }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
           </div>
-
-          <div class="row mt-4">
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Review</label>
-                {{ form.rating_precision }}
-              </div>
-            </div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Déjà joué?</label>
-                {{ form.never_played }}
-              </div>
-            </div>
-          </div>
-
-          <div class="row mt-4">
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Fini?</label>
-                {{ form.completion_status }}
-                <i class="fas fa-sm mr-2 text-gray-500">Requis</i>
-              </div>
-            </div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Où en êtes vous dans le jeu?</label>
-                {{ form.completion_precision }}
-              </div>
-            </div>
-          </div>
-
-          <div class="row mt-4">
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Nombre de succès obtenus</label>
-                {{ form.achievements_earned }}
-              </div>
-            </div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Nombre de succès total du jeu</label>
-                {{ form.achievements_to_be_earned }}
-              </div>
-            </div>
-          </div>
-
-          <div class="row mt-4">
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Status de possession</label>
-                {{ form.owning_status }}
-                <i class="fas fa-sm mr-2 text-gray-500">Requis</i>
-              </div>
-            </div>
-          </div>
-
-          <div class="row mt-4 mb-4">
+          <div class="row mt-4 pt-5 mb-4">
             <div class="col-xl-5 col-lg-1"></div>
             <div class="col-xl-2 col-lg-1">
               <div class="align-items-center justify-content-center text-center">
                 <button type="submit" class="btn btn-primary">Save</button>
               </div>
             </div>
-
           </div>
         </form>
       </div>

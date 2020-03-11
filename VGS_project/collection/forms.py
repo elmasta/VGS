@@ -23,36 +23,6 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         "class": "form-control"}))
 
-class SearchGameForm(forms.ModelForm):
-
-    class Meta:
-        model = Games
-        fields = ["name"]
-        labels = {"name": "Choisissez un jeu"}
-        widgets = {
-            "name": forms.TextInput(attrs={
-                "class": "form-control",
-                "list": "games",
-                "placeholder": "Recherche de jeux",
-                "size": "200"
-            }),
-        }
-
-class SearchCompilationForm(forms.ModelForm):
-
-    class Meta:
-        model = Compilation
-        fields = ["name"]
-        labels = {"name": "Choisissez une compilation"}
-        widgets = {
-            "name": forms.TextInput(attrs={
-                "class": "form-control",
-                "list": "compil",
-                "placeholder": "Recherche de compilation",
-                "size": "200"
-            }),
-        }
-
 class ChangeAvatarForm(forms.ModelForm):
 
     class Meta:
@@ -128,7 +98,7 @@ class GameCreationForm(forms.ModelForm):
             "owning_status": forms.Select(attrs={"class": "form-control"}),
         }
 
-class DLCCreationForm(forms.ModelForm):
+class CompilCreationForm(forms.ModelForm):
 
     class Meta:
         model = UserOwnedCompilation

@@ -6,7 +6,7 @@
 
 <div class="card shadow mb-4">
   <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+    <h6 class="m-0 font-weight-bold text-primary">Liste de jeu</h6>
   </div>
   <div class="card-body">
     <div class="table-responsive">
@@ -14,18 +14,20 @@
         <thead>
           <tr>
             <th>Nom</th>
-            <th>Plateforme</th>
-            <th>Région</th>
+            <th>Plateforme - Région</th>
             <th>Complétions</th>
+            <th>Page du jeu</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>exemple</td>
-            <td>exemple</td>
-            <td>exemple</td>
-            <td>exemple</td>
-          </tr>
+          {% for item in game_set %}
+            <tr>
+              <td>{{ item.game_name }}</td>
+              <td>{{ item.plateform_id }}</td>
+              <td>{{ item.completion_status }}</td>
+              <td>{{ item.plateform_id }}</td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>

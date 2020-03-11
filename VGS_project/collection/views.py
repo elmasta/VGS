@@ -1,7 +1,7 @@
 from collection.classes import *
 from collection.forms import *
 from collection.tokens import account_activation_token
-from collection.models import UserData, Games, Plateform
+from collection.models import UserData, Games, UserOwnedGame, Plateform
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
@@ -16,6 +16,7 @@ from PIL import Image
 
 def index(request):
 
+    request.session["context"] = user_plateforms(request, UserOwnedGame, Plateform)
     return return_index(request, render)
 
 def login_page(request):
@@ -126,6 +127,7 @@ def profile_page(request):
 
     if request.user.is_authenticated:
         if request.method == "POST":
+            #add avatar deletion
             form = ChangeAvatarForm(request.POST, request.FILES)
             if form.is_valid():
                 new_avatar = form.cleaned_data["profil_picture"]
@@ -164,7 +166,12 @@ def add_game(request):
             if form.is_valid():
                 game_id = form.cleaned_data["game_id"]
                 game_name = form.cleaned_data["game_name"]
-                plateform_id = form.cleaned_data["plateform_id"]
+                if game_id is None:
+                    plateform_id = form.cleaned_data["plateform_id"]
+                else:
+                    plateform_id = get_object_or_404(
+                        Games.objects.filter(id=game_id.id))
+                    plateform_id = plateform_id.plateform
                 compilation = form.cleaned_data["compilation"]
                 physical = form.cleaned_data["physical"]
                 picture = form.cleaned_data["picture"]
@@ -218,20 +225,69 @@ def add_comp(request):
 
     if request.user.is_authenticated:
         if request.method == "POST":
-            pass
+            form = CompilCreationForm(request.POST, request.FILES)
+            if form.is_valid():
+                compilation_id = form.cleaned_data["compilation_id"]
+                compilation_name = form.cleaned_data["compilation_name"]
+                if compilation_id is None:
+                    plateform_id = form.cleaned_data["plateform_id"]
+                else:
+                    plateform_id = get_object_or_404(
+                        Compilation.objects.filter(id=compilation_id.id))
+                    plateform_id = plateform_id.plateform
+                physical = form.cleaned_data["physical"]
+                picture = form.cleaned_data["picture"]
+                box_condition = form.cleaned_data["box_condition"]
+                covers_condition = form.cleaned_data["covers_condition"]
+                manual_condition = form.cleaned_data["manual_condition"]
+                game_condition = form.cleaned_data["game_condition"]
+                condition_precision = form.cleaned_data["condition_precision"]
+                owning_status = form.cleaned_data["owning_status"]
+                new_comp = UserOwnedCompilation(
+                    user=request.user,
+                    compilation_id=compilation_id,
+                    compilation_name=compilation_name,
+                    plateform_id=plateform_id,
+                    physical=physical,
+                    picture=picture,
+                    box_condition=box_condition,
+                    covers_condition=covers_condition,
+                    manual_condition=manual_condition,
+                    game_condition=game_condition,
+                    condition_precision=condition_precision,
+                    owning_status=owning_status
+                    )
+                new_comp.save()
+                #todo return to comp page
+                return return_index(request, render)
         else:
-            return render(request, "collection/add_comp.html",
-                          request.session['context'])
+            context = request.session['context']
+            form = CompilCreationForm()
+            context["form"] = form
+            return render(request, "collection/add_comp.html", context)
     else:
         return return_index(request, render)
 
-def user_collection(request):
+def user_collection(request, plateform_id):
 
     if request.user.is_authenticated:
-        if request.method == "POST":
-            pass
+        if plateform_id == "0":
+            user_games = UserOwnedGame.objects.filter(user=request.user)
         else:
-            return render(request, "collection/collection.html",
-                          request.session['context'])
+            user_games = UserOwnedGame.objects.filter(plateform_id=plateform_id,
+                                                      user=request.user)
+        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
+                             "N'a pas de fin", "Abandonné"]
+        game_set = []
+        for item in user_games:
+            item.completion_status = finished_litteral[item.completion_status - 1]
+            game_set.append(item)
+        context = request.session['context']
+        context["game_set"] = game_set
+        return render(request, "collection/collection.html", context)
     else:
         return return_index(request, render)
+
+def user_game_page(request):
+
+    pass
