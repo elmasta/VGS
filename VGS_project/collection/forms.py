@@ -1,5 +1,5 @@
 from collection.models import UserData, UserOwnedGame, Games, Compilation,\
-    UserOwnedCompilation
+    UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django import forms
@@ -137,6 +137,60 @@ class CompilCreationForm(forms.ModelForm):
                 "class": "form-control h-100 d-inline-block",
                 "required": False}),
             "owning_status": forms.Select(attrs={"class": "form-control"}),
+        }
+
+class PlateformCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = UserOwnedSubPlateform
+        fields = [
+            "subplateform",
+            "picture",
+            "box_condition",
+            "manual_condition",
+            "subplateform_condition",
+            "condition_precision"
+        ]
+        widgets = {
+            "subplateform": forms.Select(attrs={"class": "form-control"}),
+            "picture": forms.FileInput(attrs={
+                "class": "form-control", "required": False}),
+            "box_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "manual_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "subplateform_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "condition_precision": forms.TextInput(attrs={
+                "class": "form-control h-100 d-inline-block",
+                "required": False})
+        }
+
+class PlateformAddonCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = UserOwnedPlateformAddon
+        fields = [
+            "plateformaddon",
+            "picture",
+            "box_condition",
+            "manual_condition",
+            "plateformaddon_condition",
+            "condition_precision"
+        ]
+        widgets = {
+            "plateformaddon": forms.Select(attrs={"class": "form-control"}),
+            "picture": forms.FileInput(attrs={
+                "class": "form-control", "required": False}),
+            "box_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "manual_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "plateformaddon_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "condition_precision": forms.TextInput(attrs={
+                "class": "form-control h-100 d-inline-block",
+                "required": False})
         }
 
 class ParagraphErrorList(ErrorList):

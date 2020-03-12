@@ -6,7 +6,7 @@
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-  <div class="row" id="formul">
+  <div class="row">
     <div class="col-xl-2 col-lg-2"></div>
     <div class="col-xl-8 col-lg-8">
       <div class="card shadow mb-4">
@@ -15,7 +15,7 @@
           <div class="col-xl-1 col-lg-1"></div>
           <div class="col-xl-9 col-lg-1">
             <div class="align-items-center justify-content-center text-center">
-              <h4 class="text-uppercase font-weight-bold mt-4">Formulaire d'ajout de compilation</h4>
+              <h4 class="text-uppercase font-weight-bold mt-4">Formulaire d'ajout de plateforme</h4>
             </div>
           </div>
         </div>
@@ -25,50 +25,9 @@
             <div class="col-xl-1 col-lg-1"></div>
             <div class="col-xl-9 col-lg-4">
               <div class="form-group ml-4">
-                <label class="control-label">Choisissez une compilation</label>
-                {{ form.compilation_id }}
-                <i class="fas fa-sm mr-2 text-gray-500">Facultatif, sera relié à une compilation existante en base de données</i>
-              </div>
-            </div>
-          </div>
-          <div class="row mt-4">
-            <div class="col-xl-1 col-lg-1"></div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Nom de la compilation</label>
-                {{ form.compilation_name }}
-                <i class="fas fa-sm mr-2" style="color: red">Requis, 200 caractères maximum</i>
-              </div>
-            </div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Plateforme</label>
-                {{ form.plateform_id }}
-                <i class="fas fa-sm mr-2" style="color: red">Requis ou sera ignoré si une compilation a été sélectionné</i>
-              </div>
-            </div>
-            <div class="col-xl-1 col-lg-1">
-              <div class="form-group ml-4">
-                <label class="control-label">Physique?</label>
-                {{ form.physical }}
-              </div>
-            </div>
-          </div>
-          <div class="row mt-4">
-            <div class="col-xl-1 col-lg-1"></div>
-            <div class="col-xl-3 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Possédez le vous?</label>
-                {{ form.owning_status }}
-                <i class="fas fa-sm mr-2" style="color: red">Requis</i>
-              </div>
-            </div>
-            <div class="col-xl-1 col-lg-1"></div>
-            <div class="col-xl-4 col-lg-4">
-              <div class="form-group ml-4">
-                <label class="control-label">Image</label>
-                {{ form.picture }}
-                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
+                <label class="control-label">Choisissez un accessoire</label>
+                {{ form.plateformaddon }}
+                <i class="fas fa-sm mr-2" style="color: red">Requis.</i>
               </div>
             </div>
           </div>
@@ -83,8 +42,8 @@
             </div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
-                <label class="control-label">État des jaquettes</label>
-                {{ form.covers_condition }}
+                <label class="control-label">Image</label>
+                {{ form.picture }}
                 <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>
@@ -100,8 +59,8 @@
             </div>
             <div class="col-xl-4 col-lg-4">
               <div class="form-group ml-4">
-                <label class="control-label">État de la compilation</label>
-                {{ form.game_condition }}
+                <label class="control-label">État de l'accessoire</label>
+                {{ form.plateformaddon_condition }}
                 <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
               </div>
             </div>

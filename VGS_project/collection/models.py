@@ -34,6 +34,19 @@ class Owning(models.IntegerChoices):
 
 RATING = models.IntegerChoices("RATING", "0 1 2 3 4 5 6 7 8 9 10")
 
+ELEM = [
+    "Europe",
+    "Amérique du Nord",
+    "Japon",
+    "Amérique central",
+    "Emérique du Sud",
+    "Asie",
+    "Russie",
+    "Moyen Orient",
+    "Afrique",
+    "Monde"
+]
+
 class UserData(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -54,20 +67,9 @@ class Plateform(models.Model):
 
     def __str__(self):
 
-        elem = [
-            "Europe",
-            "Amérique du Nord",
-            "Japon",
-            "Amérique central",
-            "Emérique du Sud",
-            "Asie",
-            "Russie",
-            "Moyen Orient",
-            "Afrique"
-        ]
-        for num in range(len(elem)):
+        for num in range(len(ELEM)):
             if self.region == (num + 1):
-                ret_region = elem[self.region - 1]
+                ret_region = ELEM[self.region - 1]
         return self.name + " - " + str(ret_region)
 
     name = models.CharField(max_length=100)
@@ -83,6 +85,7 @@ class Plateform(models.Model):
         RUSSIE = 7, gettext_lazy("Russie")
         MOYEN_ORIENT = 8, gettext_lazy("Moyen Orient")
         AFRIQUE = 9, gettext_lazy("Afrique")
+        MONDE = 10, gettext_lazy("Monde")
 
     region = models.IntegerField(choices=Region.choices)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -103,6 +106,13 @@ class SubPlateform(models.Model):
     class Meta:
 
         ordering = ('name',)
+
+    def __str__(self):
+
+        for num in range(len(ELEM)):
+            if self.plateform.region == (num + 1):
+                ret_region = ELEM[self.plateform.region - 1]
+        return self.name + " - " + str(ret_region)
 
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -171,6 +181,14 @@ class GameDLC(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class UserOwnedCompilation(models.Model):
+
+    class Meta:
+
+        ordering = ('compilation_name',)
+
+    def __str__(self):
+
+        return self.compilation_name + " - " + str(self.plateform_id)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     #id from Compilation table (compilation_id) only if user link his

@@ -1,7 +1,8 @@
 from collection.classes import *
 from collection.forms import *
 from collection.tokens import account_activation_token
-from collection.models import UserData, Games, UserOwnedGame, Plateform
+from collection.models import UserData, Games, UserOwnedGame, Plateform,\
+    UserOwnedSubPlateform, ELEM
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
@@ -16,12 +17,13 @@ from PIL import Image
 
 def index(request):
 
-    request.session["context"] = user_plateforms(request, UserOwnedGame, Plateform)
     return return_index(request, render)
 
 def login_page(request):
 
     context = {}
+    if request.user.is_authenticated:
+        return return_index(request, render)
     if request.method == "POST":
         form = UserLoginForm(request.POST, error_class=ParagraphErrorList)
         if form.is_valid():
@@ -37,13 +39,13 @@ def login_page(request):
                         "email": request.user.email,
                         "name": request.user.first_name,
                     }
-                    picture = "https://source.unsplash.com/QAB-WJcbgJk/60x60"
-                    #utilisé 2 fois à refactoriser
+                    picture = None
                     if UserData.objects.filter(user=request.user.id).exists():
                         user_pic = UserData.objects.get(user=request.user.id)
-                        request.session['context']["profil_pic"] = user_pic.profil_picture.path
+                        request.session['context']["profil_pic"] = user_pic.profil_picture.url
                     else:
                         request.session['context']["profil_pic"] = picture
+                    request.session["context"] = user_plateforms(request, UserOwnedGame, Plateform, ELEM)
                     return return_index(request, render)
                 else:
                     #todo error message
@@ -60,6 +62,8 @@ def login_page(request):
 def register_page(request):
 
     context = {}
+    if request.user.is_authenticated:
+        return return_index(request, render)
     if request.method == "POST":
         form = UserCreationForm(request.POST, error_class=ParagraphErrorList)
         if form.is_valid():
@@ -131,7 +135,6 @@ def profile_page(request):
             form = ChangeAvatarForm(request.POST, request.FILES)
             if form.is_valid():
                 new_avatar = form.cleaned_data["profil_picture"]
-                #utilisé deux fois à refactoriser
                 if UserData.objects.filter(user=request.user).exists():
                     #todo del old picture
                     avatar = UserData.objects.get(user=request.user)
@@ -211,6 +214,7 @@ def add_game(request):
                     owning_status=owning_status
                     )
                 new_game.save()
+                request.session["context"] = user_plateforms(request, UserOwnedGame, Plateform, ELEM)
                 #todo return to game page
                 return return_index(request, render)
         else:
@@ -268,10 +272,74 @@ def add_comp(request):
     else:
         return return_index(request, render)
 
+def add_console(request):
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = PlateformCreationForm(request.POST, request.FILES)
+            if form.is_valid():
+                subplateform = form.cleaned_data["subplateform"]
+                picture = form.cleaned_data["picture"]
+                box_condition = form.cleaned_data["box_condition"]
+                manual_condition = form.cleaned_data["manual_condition"]
+                subplateform_condition = form.cleaned_data["subplateform_condition"]
+                condition_precision = form.cleaned_data["condition_precision"]
+                new_plat = UserOwnedSubPlateform(
+                    user=request.user,
+                    subplateform=subplateform,
+                    picture=picture,
+                    box_condition=box_condition,
+                    manual_condition=manual_condition,
+                    subplateform_condition=subplateform_condition,
+                    condition_precision=condition_precision
+                    )
+                new_plat.save()
+                #todo return to plateform list page
+                return return_index(request, render)
+        else:
+            context = request.session['context']
+            form = PlateformCreationForm()
+            context["form"] = form
+            return render(request, "collection/add_console.html", context)
+    else:
+        return return_index(request, render)
+
+def add_addon(request):
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = PlateformAddonCreationForm(request.POST, request.FILES)
+            if form.is_valid():
+                plateformaddon = form.cleaned_data["plateformaddon"]
+                picture = form.cleaned_data["picture"]
+                box_condition = form.cleaned_data["box_condition"]
+                manual_condition = form.cleaned_data["manual_condition"]
+                plateformaddon_condition = form.cleaned_data["plateformaddon_condition"]
+                condition_precision = form.cleaned_data["condition_precision"]
+                new_addon = UserOwnedPlateformAddon(
+                    user=request.user,
+                    plateformaddon=plateformaddon,
+                    picture=picture,
+                    box_condition=box_condition,
+                    manual_condition=manual_condition,
+                    plateformaddon_condition=plateformaddon_condition,
+                    condition_precision=condition_precision
+                    )
+                new_addon.save()
+                #todo return to accessory list page
+                return return_index(request, render)
+        else:
+            context = request.session['context']
+            form = PlateformAddonCreationForm()
+            context["form"] = form
+            return render(request, "collection/add_addon.html", context)
+    else:
+        return return_index(request, render)
+
 def user_collection(request, plateform_id):
 
     if request.user.is_authenticated:
-        if plateform_id == "0":
+        if plateform_id == "0" or plateform_id.isdigit() is False:
             user_games = UserOwnedGame.objects.filter(user=request.user)
         else:
             user_games = UserOwnedGame.objects.filter(plateform_id=plateform_id,
@@ -288,6 +356,6 @@ def user_collection(request, plateform_id):
     else:
         return return_index(request, render)
 
-def user_game_page(request):
+def user_game_page(request, game_id):
 
     pass

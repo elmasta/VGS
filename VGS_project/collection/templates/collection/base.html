@@ -72,16 +72,22 @@
         <hr class="sidebar-divider">
   
         <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item active">
+          <a class="nav-link" href="index.html">
+            <span>Mes compilation</span></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'user_collection' '0' %}">
+            <span>Mes jeux</span></a>
+        </li>
         <li class="nav-item">
           <a class="nav-link collapsed active" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-folder"></i>
             <span>Mes jeux par plateforme</span>
           </a>
           <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Collection:</h6>
               {% for item in platfor_user %}
-                <a class="collapse-item" style="overflow-wrap" href="{% url 'user_collection' plateform_id=item.plid %}">{{ item.pname }}</a>
+                <a class="collapse-item" style="font-size: 9px" href="{% url 'user_collection' plateform_id=item.plid %}">{{ item.pname }}</a>
               {% endfor %}
             </div>
           </div>
@@ -171,7 +177,11 @@
               <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ username }}</span>
-                  <img class="img-profile rounded-circle" src="{{ profil_pic }}">
+                  {% if profil_pic is None %}
+                    <img class="img-profile rounded-circle" src="{% static 'collection/img/unknown.png' %}">
+                  {% else %}
+                    <img class="img-profile rounded-circle" src="{% static profil_pic %}">
+                  {% endif %}
                 </a>
                 <!-- Dropdown - User Information -->
                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
