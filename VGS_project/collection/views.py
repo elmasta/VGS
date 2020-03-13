@@ -42,10 +42,12 @@ def login_page(request):
                     picture = None
                     if UserData.objects.filter(user=request.user.id).exists():
                         user_pic = UserData.objects.get(user=request.user.id)
-                        request.session['context']["profil_pic"] = user_pic.profil_picture.url
+                        request.session['context']["profil_pic"] =\
+                            user_pic.profil_picture.path
                     else:
                         request.session['context']["profil_pic"] = picture
-                    request.session["context"] = user_plateforms(request, UserOwnedGame, Plateform, ELEM)
+                    request.session["context"] = user_plateforms(
+                        request, UserOwnedGame, Plateform, ELEM)
                     return return_index(request, render)
                 else:
                     #todo error message
@@ -117,7 +119,7 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        # return redirect('home')
+        # todo: send to login
         return HttpResponse("Thank you for your email confirmation. Now you can login your account.")
     else:
         return HttpResponse("Activation link is invalid!")
@@ -136,19 +138,27 @@ def profile_page(request):
             if form.is_valid():
                 new_avatar = form.cleaned_data["profil_picture"]
                 if UserData.objects.filter(user=request.user).exists():
-                    #todo del old picture
                     avatar = UserData.objects.get(user=request.user)
                     avatar.profil_picture = new_avatar
                     avatar.save()
                 else:
-                    avatar = UserData(profil_picture=new_avatar, user=request.user)
+                    avatar = UserData(profil_picture=new_avatar,
+                                      user=request.user)
                     avatar.save()
-            user_pic = UserData.objects.get(user=request.user)
-            request.session['context']["profil_pic"] = user_pic.profil_picture.path
-        context = request.session['context']
+                user_pic = UserData.objects.get(user=request.user)
+                request.session["context"]["profil_pic"] =\
+                            user_pic.profil_picture.path
         form = ChangeAvatarForm()
-        context["form"] = form
-        context["date_joined"] = request.user.date_joined
+        user_pic = UserData.objects.get(user=request.user)
+        context = {
+            "username": request.session["context"]["username"],
+            "email": request.session["context"]["email"],
+            "name": request.session["context"]["name"],
+            "form": form,
+            "date_joined": request.user.date_joined,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
         return render(request, "collection/profile.html", context)
     else:
         return login_page(request)
@@ -156,8 +166,7 @@ def profile_page(request):
 def add_item(request):
 
     if request.user.is_authenticated:
-        context = request.session['context']
-        return render(request, "collection/add_item.html", context)
+        return render(request, "collection/add_item.html", request.session['context'])
     else:
         return return_index(request, render)
 
@@ -187,9 +196,11 @@ def add_game(request):
                 rating_precision = form.cleaned_data["rating_precision"]
                 never_played = form.cleaned_data["never_played"]
                 completion_status = form.cleaned_data["completion_status"]
-                completion_precision = form.cleaned_data["completion_precision"]
+                completion_precision = form.cleaned_data[
+                    "completion_precision"]
                 achievements_earned = form.cleaned_data["achievements_earned"]
-                achievements_to_be_earned = form.cleaned_data["achievements_to_be_earned"]
+                achievements_to_be_earned = form.cleaned_data[
+                    "achievements_to_be_earned"]
                 owning_status = form.cleaned_data["owning_status"]
                 new_game = UserOwnedGame(
                     user=request.user,
@@ -214,9 +225,10 @@ def add_game(request):
                     owning_status=owning_status
                     )
                 new_game.save()
-                request.session["context"] = user_plateforms(request, UserOwnedGame, Plateform, ELEM)
-                #todo return to game page
-                return return_index(request, render)
+                request.session["context"] = user_plateforms(
+                    request, UserOwnedGame, Plateform, ELEM
+                    )
+                return user_game_page(request, game_id)
         else:
             context = request.session['context']
             form = GameCreationForm()
@@ -282,7 +294,8 @@ def add_console(request):
                 picture = form.cleaned_data["picture"]
                 box_condition = form.cleaned_data["box_condition"]
                 manual_condition = form.cleaned_data["manual_condition"]
-                subplateform_condition = form.cleaned_data["subplateform_condition"]
+                subplateform_condition = form.cleaned_data[
+                    "subplateform_condition"]
                 condition_precision = form.cleaned_data["condition_precision"]
                 new_plat = UserOwnedSubPlateform(
                     user=request.user,
@@ -314,7 +327,8 @@ def add_addon(request):
                 picture = form.cleaned_data["picture"]
                 box_condition = form.cleaned_data["box_condition"]
                 manual_condition = form.cleaned_data["manual_condition"]
-                plateformaddon_condition = form.cleaned_data["plateformaddon_condition"]
+                plateformaddon_condition = form.cleaned_data[
+                    "plateformaddon_condition"]
                 condition_precision = form.cleaned_data["condition_precision"]
                 new_addon = UserOwnedPlateformAddon(
                     user=request.user,
@@ -342,13 +356,16 @@ def user_collection(request, plateform_id):
         if plateform_id == "0" or plateform_id.isdigit() is False:
             user_games = UserOwnedGame.objects.filter(user=request.user)
         else:
-            user_games = UserOwnedGame.objects.filter(plateform_id=plateform_id,
-                                                      user=request.user)
+            user_games = UserOwnedGame.objects.filter(
+                plateform_id=plateform_id,
+                user=request.user
+                )
         finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
                              "N'a pas de fin", "Abandonné"]
         game_set = []
         for item in user_games:
-            item.completion_status = finished_litteral[item.completion_status - 1]
+            item.completion_status = finished_litteral[item.completion_status
+                 - 1]
             game_set.append(item)
         context = request.session['context']
         context["game_set"] = game_set
@@ -358,4 +375,56 @@ def user_collection(request, plateform_id):
 
 def user_game_page(request, game_id):
 
-    pass
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            user_game = get_object_or_404(UserOwnedGame.objects.filter(
+                id=game_id, user=request.user))
+            form = GameModificationForm(request.POST, request.FILES)
+            if form.is_valid():
+                if form.cleaned_data["game_id"] is not None:
+                    if user_game.game_id is None:
+                        user_game.plateform_id = form.cleaned_data[
+                            "plateform_id"]
+                else:
+                    user_game.game_id = form.cleaned_data["game_id"]
+                    plateform_id = get_object_or_404(
+                        Games.objects.filter(id=user_game.game_id.id))
+                    user_game.plateform_id = plateform_id.plateform
+                user_game.game_name = form.cleaned_data["game_name"]
+                user_game.compilation = form.cleaned_data["compilation"]
+                user_game.physical = form.cleaned_data["physical"]
+                user_game.picture = form.cleaned_data["picture"]
+                user_game.box_condition = form.cleaned_data[
+                    "box_condition"]
+                user_game.covers_condition = form.cleaned_data[
+                    "covers_condition"]
+                user_game.manual_condition = form.cleaned_data[
+                    "manual_condition"]
+                user_game.game_condition = form.cleaned_data[
+                    "game_condition"]
+                user_game.condition_precision = form.cleaned_data[
+                    "condition_precision"]
+                user_game.rating = form.cleaned_data["rating"]
+                user_game.rating_precision = form.cleaned_data[
+                    "rating_precision"]
+                user_game.never_played = form.cleaned_data["never_played"]
+                user_game.completion_status = form.cleaned_data[
+                    "completion_status"]
+                user_game.completion_precision = form.cleaned_data[
+                    "completion_precision"]
+                user_game.achievements_earned = form.cleaned_data[
+                    "achievements_earned"]
+                user_game.achievements_to_be_earned = form.cleaned_data[
+                    "achievements_to_be_earned"]
+                user_game.owning_status = form.cleaned_data[
+                    "owning_status"]
+                user_game.save()
+        user_game = get_object_or_404(UserOwnedGame.objects.filter(
+            id=game_id, user=request.user))
+        context = request.session['context']
+        form = GameModificationForm()
+        context["form"] = form
+        context["user_game"] = user_game
+        return render(request, "collection/game_page.html", context)
+    else:
+        return return_index(request, render)

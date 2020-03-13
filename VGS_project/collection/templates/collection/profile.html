@@ -34,16 +34,18 @@
           <img height="300" width="300" src="{% static profil_pic %}">
         {% endif %}
       </div>
-      <form class="user" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-          <label class="control-label">Changez votre avatar:</label>
-          {{ form.profil_picture }}
-          <div class="align-items-center justify-content-center text-center pt-2">
-            <button type="submit" class="btn btn-success">Envoyer</button>
+      {% if form %}
+        <form class="user" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="control-label">Changez votre avatar:</label>
+            {{ form.profil_picture }}
+            <div class="align-items-center justify-content-center text-center pt-2">
+              <button type="submit" class="btn btn-success">Envoyer</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      {% endif %}
     </div>
   </div>
 

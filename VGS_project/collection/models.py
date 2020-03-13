@@ -55,10 +55,6 @@ class UserData(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-@receiver(models.signals.post_delete, sender=UserData)
-def submission_delete(sender, instance, **kwargs):
-    instance.profil_picture.delete(False)
-
 class Plateform(models.Model):
 
     class Meta:

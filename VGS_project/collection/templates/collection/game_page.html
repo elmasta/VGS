@@ -1,0 +1,198 @@
+{% extends 'collection/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+  <div class="row" id="formul">
+    <div class="col-xl-2 col-lg-2"></div>
+    <div class="col-xl-8 col-lg-8">
+      <div class="card shadow mb-4">
+        <!-- Card Body -->
+        <div class="row mt-4">
+          <div class="col-xl-1 col-lg-1"></div>
+          <div class="col-xl-9 col-lg-1">
+            <div class="align-items-center justify-content-center text-center">
+              <h4 class="text-uppercase font-weight-bold mt-4">{{ user_game.game_name }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+        <form class="user" method="post">
+          {% csrf_token %}
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-9 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Choisissez un jeu</label>
+                {{ form.game_id }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.game_id }}</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Nom du jeu</label>
+                {{ form.game_name }}
+                <i class="fas fa-sm mr-2" style="color: red">{{ user_game.game_name }}</i>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Plateforme</label>
+                {{ form.plateform_id }}
+                <i class="fas fa-sm mr-2" style="color: red">{{ user_game.plateform_id }}</i>
+              </div>
+            </div>
+            <div class="col-xl-1 col-lg-1">
+              <div class="form-group ml-4">
+                <label class="control-label">Physique?</label>
+                {{ form.physical }}
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Compilation</label>
+                {{ form.compilation }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.compilation }}</i>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Image</label>
+                {{ form.picture }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.picture }}</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">État de la boite</label>
+                {{ form.box_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.box_condition }}</i>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">État des jaquettes</label>
+                {{ form.covers_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.covers_condition }}</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">État du manuel</label>
+                {{ form.manual_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.manual_condition }}</i>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">État du jeu</label>
+                {{ form.game_condition }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.game_condition }}</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-9 col-lg-4">
+              <div class="form-group ml-4" style="height: 100px">
+                <label class="control-label">Détail sur l'état de l'ensemble</label>
+                {{ form.condition_precision }}
+                <i class="fas fa-sm mr-2 text-gray-500">{{ user_game.condition_precision }}</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4 pt-5">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-1 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Note</label>
+                {{ form.rating }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
+              </div>
+            </div>
+            <div class="col-xl-8 col-lg-4">
+              <div class="form-group ml-4" style="height: 100px">
+                <label class="control-label">Review</label>
+                {{ form.rating_precision }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4 pt-5">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-1 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Déjà joué?</label>
+                {{ form.never_played }}
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Fini?</label>
+                {{ form.completion_status }}
+                <i class="fas fa-sm mr-2" style="color: red">Requis</i>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Où en êtes vous dans le jeu?</label>
+                {{ form.completion_precision }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-3 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Nombre de succès obtenus</label>
+                {{ form.achievements_earned }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Nombre de succès total du jeu</label>
+                {{ form.achievements_to_be_earned }}
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif</i>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-4">
+              <div class="form-group ml-4">
+                <label class="control-label">Possédez le vous?</label>
+                {{ form.owning_status }}
+                <i class="fas fa-sm mr-2" style="color: red">Requis</i>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4 mb-4">
+            <div class="col-xl-5 col-lg-1"></div>
+            <div class="col-xl-2 col-lg-1">
+              <div class="align-items-center justify-content-center text-center">
+                <button type="submit" class="btn btn-primary">Sauvegarder</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- /.container-fluid -->
+{% endblock %}

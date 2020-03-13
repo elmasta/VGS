@@ -25,7 +25,6 @@ def user_plateforms(request, user_owned_game, plateform, ELEM):
         user_plateform_list = " - ".join(user_plateform_list)
         user_platfor_list.append({"plid": item,
                                   "pname": user_plateform_list})
-    print(user_platfor_list)
     context = request.session["context"]
     context["platfor_user"] = user_platfor_list
     return context

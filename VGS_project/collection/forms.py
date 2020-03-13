@@ -98,6 +98,81 @@ class GameCreationForm(forms.ModelForm):
             "owning_status": forms.Select(attrs={"class": "form-control"}),
         }
 
+class GameModificationForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+
+        super(GameModificationForm, self).__init__(*args, **kwargs)
+        self.fields["game_name"].required = False
+        self.fields["completion_status"].required = False
+        self.fields["owning_status"].required = False
+
+    class Meta:
+        model = UserOwnedGame
+        fields = [
+            "game_id",
+            "game_name",
+            "plateform_id",
+            "compilation",
+            "physical",
+            "picture",
+            "box_condition",
+            "covers_condition",
+            "manual_condition",
+            "game_condition",
+            "condition_precision",
+            "rating",
+            "rating_precision",
+            "never_played",
+            "completion_status",
+            "completion_precision",
+            "achievements_earned",
+            "achievements_to_be_earned",
+            "owning_status"
+        ]
+        widgets = {
+            "game_id": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "game_name": forms.TextInput(attrs={
+                "class": "form-control", "required": False}),
+            "plateform_id": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "compilation": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "physical": forms.CheckboxInput(attrs={
+                "class": "form-control", "required": False}),
+            "picture": forms.FileInput(attrs={
+                "class": "form-control", "required": False}),
+            "box_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "covers_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "manual_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "game_condition": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "condition_precision": forms.TextInput(attrs={
+                "class": "form-control h-100 d-inline-block",
+                "required": False}),
+            "rating": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "rating_precision": forms.TextInput(attrs={
+                "class": "form-control h-100 d-inline-block",
+                "required": False}),
+            "never_played": forms.CheckboxInput(attrs={
+                "class": "form-control", "required": False}),
+            "completion_status": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+            "completion_precision": forms.TextInput(attrs={
+                "class": "form-control", "required": False}),
+            "achievements_earned": forms.NumberInput(attrs={
+                "class": "form-control", "required": False}),
+            "achievements_to_be_earned": forms.NumberInput(attrs={
+                "class": "form-control", "required": False}),
+            "owning_status": forms.Select(attrs={
+                "class": "form-control", "required": False}),
+        }
+
 class CompilCreationForm(forms.ModelForm):
 
     class Meta:
