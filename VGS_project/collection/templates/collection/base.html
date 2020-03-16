@@ -12,6 +12,7 @@
   <title>VGS (Beta)</title>
 
   {% load static %}
+  <link rel="icon" type="image/png" href="{% static 'collection/img/favicon_alt_trans.png' %}" />
 
   <!-- Custom fonts for this template-->
   <link href="{% static 'collection/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css" />
@@ -42,9 +43,8 @@
       {% if request.user.is_authenticated %}
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span></a>
+          <a class="nav-link" href="{% url 'profile_page' %}">
+            <span>Mon profil</span></a>
         </li>
   
         <!-- Divider -->
@@ -52,24 +52,18 @@
   
         <li class="nav-item active">
           <a class="nav-link" href="index.html">
-            <i class="fas fa-fw fa-cog"></i>
             <span>Mes Photos</span></a>
         </li>
   
         <li class="nav-item active">
           <a class="nav-link" href="index.html">
-            <i class="fas fa-fw fa-cog"></i>
             <span>Mes Consoles</span></a>
         </li>
   
         <li class="nav-item active">
           <a class="nav-link" href="index.html">
-            <i class="fas fa-fw fa-cog"></i>
             <span>Mes Accessoires</span></a>
         </li>
-  
-        <!-- Divider -->
-        <hr class="sidebar-divider">
   
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item active">
@@ -237,6 +231,7 @@
 
   <!-- Page level custom scripts -->
   <script src="{% static 'collection/js/demo/datatables-demo.js' %}"></script>
+  <script src="{% static 'collection/js/DataTable_FR.js' %}"></script>
 
 </body>
 

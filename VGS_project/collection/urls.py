@@ -8,6 +8,7 @@ urlpatterns = [
     path('logout/', views.user_logout, name='user_logout'),
     path('add_item/', views.add_item, name='add_item'),
     path('add_game/', views.add_game, name='add_game'),
+    path('add_DLC/', views.add_DLC, name='add_DLC'),
     path('add_comp/', views.add_comp, name='add_comp'),
     path('add_console/', views.add_console, name='add_console'),
     path('add_addon/', views.add_addon, name='add_addon'),

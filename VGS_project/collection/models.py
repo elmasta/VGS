@@ -212,6 +212,14 @@ class UserOwnedCompilation(models.Model):
 
 class UserOwnedGame(models.Model):
 
+    class Meta:
+
+        ordering = ('game_name',)
+
+    def __str__(self):
+
+        return self.game_name + " - " + str(self.plateform_id)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     #id from Games table (game_id) only if user link his game to the game
     #database

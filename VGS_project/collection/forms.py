@@ -1,5 +1,6 @@
 from collection.models import UserData, UserOwnedGame, Games, Compilation,\
-    UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon
+    UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon,\
+    UserOwnedGameDLC
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django import forms
@@ -34,6 +35,15 @@ class ChangeAvatarForm(forms.ModelForm):
         }
 
 class GameCreationForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+
+        current_user = kwargs.pop('current_user', None)
+        super(GameCreationForm, self).__init__(*args, **kwargs)
+        if current_user:
+            self.fields["compilation"].queryset =\
+                self.fields["compilation"].queryset.filter(
+                    user=current_user.id)
 
     class Meta:
         model = UserOwnedGame
@@ -98,47 +108,48 @@ class GameCreationForm(forms.ModelForm):
             "owning_status": forms.Select(attrs={"class": "form-control"}),
         }
 
-class GameModificationForm(forms.ModelForm):
+#def __init__(self, *args, **kwargs):
+
+#        super(GameModificationForm, self).__init__(*args, **kwargs)
+#        self.fields["game_name"].required = False
+#        self.fields["completion_status"].required = False
+#        self.fields["owning_status"].required = False
+
+class DLCCreationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        super(GameModificationForm, self).__init__(*args, **kwargs)
-        self.fields["game_name"].required = False
-        self.fields["completion_status"].required = False
-        self.fields["owning_status"].required = False
+        current_user = kwargs.pop('current_user', None)
+        super(DLCCreationForm, self).__init__(*args, **kwargs)
+        if current_user:
+            self.fields["gameowned_id"].queryset =\
+                self.fields["gameowned_id"].queryset.filter(
+                    user=current_user.id)
 
     class Meta:
-        model = UserOwnedGame
+        model = UserOwnedGameDLC
         fields = [
-            "game_id",
-            "game_name",
-            "plateform_id",
-            "compilation",
+            "gameowned_id",
+            "gamedlc_id",
+            "gamedlc_name",
             "physical",
             "picture",
             "box_condition",
             "covers_condition",
             "manual_condition",
-            "game_condition",
+            "gamedlc_condition",
             "condition_precision",
             "rating",
             "rating_precision",
-            "never_played",
-            "completion_status",
-            "completion_precision",
-            "achievements_earned",
-            "achievements_to_be_earned",
             "owning_status"
         ]
         widgets = {
-            "game_id": forms.Select(attrs={
+            "gameowned_id": forms.Select(attrs={
+                "class": "form-control"}),
+            "gamedlc_id": forms.Select(attrs={
                 "class": "form-control", "required": False}),
-            "game_name": forms.TextInput(attrs={
-                "class": "form-control", "required": False}),
-            "plateform_id": forms.Select(attrs={
-                "class": "form-control", "required": False}),
-            "compilation": forms.Select(attrs={
-                "class": "form-control", "required": False}),
+            "gamedlc_name": forms.TextInput(attrs={
+                "class": "form-control"}),
             "physical": forms.CheckboxInput(attrs={
                 "class": "form-control", "required": False}),
             "picture": forms.FileInput(attrs={
@@ -149,7 +160,7 @@ class GameModificationForm(forms.ModelForm):
                 "class": "form-control", "required": False}),
             "manual_condition": forms.Select(attrs={
                 "class": "form-control", "required": False}),
-            "game_condition": forms.Select(attrs={
+            "gamedlc_condition": forms.Select(attrs={
                 "class": "form-control", "required": False}),
             "condition_precision": forms.TextInput(attrs={
                 "class": "form-control h-100 d-inline-block",
@@ -159,18 +170,8 @@ class GameModificationForm(forms.ModelForm):
             "rating_precision": forms.TextInput(attrs={
                 "class": "form-control h-100 d-inline-block",
                 "required": False}),
-            "never_played": forms.CheckboxInput(attrs={
-                "class": "form-control", "required": False}),
-            "completion_status": forms.Select(attrs={
-                "class": "form-control", "required": False}),
-            "completion_precision": forms.TextInput(attrs={
-                "class": "form-control", "required": False}),
-            "achievements_earned": forms.NumberInput(attrs={
-                "class": "form-control", "required": False}),
-            "achievements_to_be_earned": forms.NumberInput(attrs={
-                "class": "form-control", "required": False}),
             "owning_status": forms.Select(attrs={
-                "class": "form-control", "required": False}),
+                "class": "form-control"}),
         }
 
 class CompilCreationForm(forms.ModelForm):
