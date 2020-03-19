@@ -23,6 +23,30 @@
             <a href="#">Message(s) privé</a>
           </h6>
           <hr class="divider my-4">
+          <div class="align-items-center justify-content-center text-center">
+            <h1 class="text-uppercase font-weight-bold mt-4">Vos photos:</h1>
+          </div>
+          <hr class="divider my-4">
+            {% for item in game_set %}
+
+            {% endfor %}
+          <hr class="divider my-4">  
+          <div class="align-items-center justify-content-center text-center">
+            <form class="user" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <h1 class="text-uppercase font-weight-bold mt-4">Ajoutez une photo</h1>
+                {{ addcollpicform.collection_picture }}
+                <div class="form-group pt-4">
+                  <button type="submit" class="btn btn-success">Ajouter la photo</button>
+                </div>
+                <div class="form-group pt-2">
+                  <label class="control-label">La rendre privé (vous seul pourrez la voir)</label>
+                  {{ addcollpicform.private }}
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -34,18 +58,16 @@
           <img height="300" width="300" src="{% static profil_pic %}">
         {% endif %}
       </div>
-      {% if form %}
-        <form class="user" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="form-group">
-            <label class="control-label">Changez votre avatar:</label>
-            {{ form.profil_picture }}
-            <div class="align-items-center justify-content-center text-center pt-2">
-              <button type="submit" class="btn btn-success">Envoyer</button>
-            </div>
+      <form class="user" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="control-label">Changez votre avatar:</label>
+          {{ addprofpicform.profil_picture }}
+          <div class="align-items-center justify-content-center text-center pt-2">
+            <button type="submit" class="btn btn-success">Envoyer</button>
           </div>
-        </form>
-      {% endif %}
+        </div>
+      </form>
     </div>
   </div>
 

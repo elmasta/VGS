@@ -7,7 +7,7 @@ def return_index(request, render):
     #Person.objects.values('optional_first_name').annotate(c=Count('optional_first_name')).order_by('-c')
     if request.user.is_authenticated:
         return render(request, "collection/index.html",
-            request.session["context"])
+                      request.session["context"])
     else:
         return render(request, "collection/index.html")
 

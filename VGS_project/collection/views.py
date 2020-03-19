@@ -2,7 +2,7 @@ from collection.classes import *
 from collection.forms import *
 from collection.tokens import account_activation_token
 from collection.models import UserData, Games, UserOwnedGame, Plateform,\
-    UserOwnedSubPlateform, ELEM
+    UserOwnedSubPlateform, CollectionPicture, ELEM
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
@@ -146,20 +146,49 @@ def profile_page(request):
                 context = request.session["context"]
                 context["profil_pic"] = user_pic.profil_picture.path
                 request.session["context"] = context
-        form = ChangeAvatarForm()
+        addprofpicform = ChangeAvatarForm()
+        addcollpicform = AddPhotosForm()
+        photos = CollectionPicture.objects.filter(user=request.user)[:5]
         if request.session["context"]["profil_pic"] is not None:
             user_pic = UserData.objects.get(user=request.user)
         context = {
             "username": request.session["context"]["username"],
             "email": request.session["context"]["email"],
             "name": request.session["context"]["name"],
-            "form": form,
+            "addprofpicform": addprofpicform,
+            "addcollpicform": addcollpicform,
+            "photos": photos,
             "date_joined": request.user.date_joined,
             "profil_pic": request.session["context"]["profil_pic"],
             "platfor_user": request.session["context"]["platfor_user"]
         }
         return render(request, "collection/profile.html", context)
     return redirect("login_page")
+
+def user_photos(request):
+
+    #to be finished
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            #EmployeeDetails.object.get(...).delete()
+
+            pass
+        return render(request, "collection/photo.html")
+        addcollpicform = AddPhotosForm()
+        photos = CollectionPicture.objects.filter(user=request.user)
+        if request.session["context"]["profil_pic"] is not None:
+            user_pic = UserData.objects.get(user=request.user)
+        context = {
+            "username": request.session["context"]["username"],
+            "addprofpicform": addprofpicform,
+            "addcollpicform": addcollpicform,
+            "photos": photos,
+            "date_joined": request.user.date_joined,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
+        return render(request, "collection/profile.html", context)
+    return redirect("index")
 
 def add_item(request):
 
@@ -414,8 +443,78 @@ def user_collection(request, plateform_id):
         return render(request, "collection/collection.html", context)
     return redirect("index")
 
+def user_accessory(request, plateform_id):
+
+    #to be done
+    if request.user.is_authenticated:
+        if plateform_id == "0" or plateform_id.isdigit() is False:
+            user_games = UserOwnedGame.objects.filter(user=request.user)
+        else:
+            user_games = UserOwnedGame.objects.filter(
+                plateform_id=plateform_id,
+                user=request.user
+                )
+        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
+                             "N'a pas de fin", "Abandonné"]
+        game_set = []
+        for item in user_games:
+            item.completion_status = finished_litteral[item.completion_status
+                 - 1]
+            game_set.append(item)
+        context = request.session['context']
+        context["game_set"] = game_set
+        return render(request, "collection/collection.html", context)
+    return redirect("index")
+
+def user_consoles(request, plateform_id):
+
+    #to be done
+    if request.user.is_authenticated:
+        if plateform_id == "0" or plateform_id.isdigit() is False:
+            user_games = UserOwnedGame.objects.filter(user=request.user)
+        else:
+            user_games = UserOwnedGame.objects.filter(
+                plateform_id=plateform_id,
+                user=request.user
+                )
+        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
+                             "N'a pas de fin", "Abandonné"]
+        game_set = []
+        for item in user_games:
+            item.completion_status = finished_litteral[item.completion_status
+                 - 1]
+            game_set.append(item)
+        context = request.session['context']
+        context["game_set"] = game_set
+        return render(request, "collection/collection.html", context)
+    return redirect("index")
+
+def user_compilations(request, plateform_id):
+
+    #to be done
+    if request.user.is_authenticated:
+        if plateform_id == "0" or plateform_id.isdigit() is False:
+            user_games = UserOwnedGame.objects.filter(user=request.user)
+        else:
+            user_games = UserOwnedGame.objects.filter(
+                plateform_id=plateform_id,
+                user=request.user
+                )
+        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
+                             "N'a pas de fin", "Abandonné"]
+        game_set = []
+        for item in user_games:
+            item.completion_status = finished_litteral[item.completion_status
+                 - 1]
+            game_set.append(item)
+        context = request.session['context']
+        context["game_set"] = game_set
+        return render(request, "collection/collection.html", context)
+    return redirect("index")
+
 def user_game_page(request, game_id):
 
+    #to be done
     if request.user.is_authenticated:
         if request.method == "POST":
             user_game = get_object_or_404(UserOwnedGame.objects.filter(

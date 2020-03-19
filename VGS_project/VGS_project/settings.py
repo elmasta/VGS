@@ -32,6 +32,8 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'collection.apps.CollectionConfig',
+    'django.contrib.sites',
+    'django_messages',
     'django_cleanup',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
@@ -78,8 +82,13 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'VGS_project.wsgi.application'
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django_messages.context_processors.inbox',
+)
 
+DJANGO_MESSAGES_NOTIFY = False
+
+WSGI_APPLICATION = 'VGS_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

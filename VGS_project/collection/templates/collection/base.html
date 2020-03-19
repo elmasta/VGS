@@ -11,6 +11,7 @@
 
   <title>VGS (Beta)</title>
 
+  {% load inbox %}
   {% load static %}
   <link rel="icon" type="image/png" href="{% static 'collection/img/favicon_alt_trans.png' %}" />
 
@@ -33,15 +34,16 @@
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'index' %}">
-        <div class="sidebar-brand-icon rotate-n-15">
-          <i class="fas fa-laugh-wink"></i>
-        </div>
-        <div class="sidebar-brand-text mx-3">VGS <sup>beta</sup></div>
-      </a>
+      <img height="100" width="180" src="{% static 'collection/img/base_logo.png' %}">
 
       {% if request.user.is_authenticated %}
         <!-- Nav Item - Dashboard -->
+
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'index' %}">
+            <span>Retour à l'accueil</span></a>
+        </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="{% url 'profile_page' %}">
             <span>Mon profil</span></a>
@@ -49,31 +51,39 @@
   
         <!-- Divider -->
         <hr class="sidebar-divider">
+
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'add_item' %}">
+            <span>Faire un ajout</span></a>
+        </li>
+
+        <hr class="sidebar-divider">
   
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="{% url 'user_photos' %}">
             <span>Mes Photos</span></a>
         </li>
   
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="{% url 'user_consoles' %}">
             <span>Mes Consoles</span></a>
         </li>
   
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="{% url 'user_accessory' %}">
             <span>Mes Accessoires</span></a>
         </li>
   
-        <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="{% url 'user_compilations' %}">
             <span>Mes compilation</span></a>
         </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="{% url 'user_collection' '0' %}">
             <span>Mes jeux</span></a>
         </li>
+
         <li class="nav-item">
           <a class="nav-link collapsed active" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
             <span>Mes jeux par plateforme</span>
@@ -116,26 +126,33 @@
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
 
-            <!-- Nav Item - Add games -->
             {% if request.user.is_authenticated %}
-              <li class="nav-item mx-1">
-                <a class="nav-link" href="{% url 'add_item' %}">
-                  <span class="text-gray-600">Faire un ajout</span>
+
+              <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="MessagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="mr-2 text-gray-600 small">Messages privé</span>
                 </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="MessagesDropdown">
+                  <a class="dropdown-item" href="{% url 'messages_inbox' %}">
+                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Boite de réception
+                  </a>
+                  <a class="dropdown-item" href="{% url 'messages_compose' %}">
+                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Envoyer un message
+                  </a>
+                  <a class="dropdown-item" href="{% url 'messages_outbox' %}">
+                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Boite d'envoi
+                  </a>
+                  <a class="dropdown-item" href="{% url 'messages_trash' %}">
+                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Corbeille
+                  </a>
+                </div>
               </li>
-            {% endif %}
 
-            <!-- Nav Item - Forum -->
-            <li class="nav-item mx-1">
-              <a class="nav-link" href="Forum.html">
-                <span class="text-gray-600">Forum</span>
-              </a>
-            </li>
-
-            <div class="topbar-divider d-none d-sm-block"></div>
-
-            <!-- Nav Item - User Information -->
-            {% if request.user.is_authenticated %}
+              <!-- Nav Item - User Information -->
               <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ username }}</span>
@@ -151,13 +168,9 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profil
                   </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Message(s) privé
-                  </a>
                   <a class="dropdown-item" href="{% url 'user_logout' %}">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Déconnection
+                    Déconnexion
                   </a>
                 </div>
               </li>
@@ -187,7 +200,7 @@
           <div class="container">
             <div class="row">
               <div class="col-lg-6 ml-auto text-center mb-5 mb-lg-0">
-                <a href="/product/legal_notice">mentions legals</a>
+                <a href="/collection/about.html">à propos</a>
               </div>
               <div class="col-lg-6 mr-auto text-center">
                 <a href="mailto:valentinrobin1@gmail.com">contact</a>
@@ -231,7 +244,6 @@
 
   <!-- Page level custom scripts -->
   <script src="{% static 'collection/js/demo/datatables-demo.js' %}"></script>
-  <script src="{% static 'collection/js/DataTable_FR.js' %}"></script>
 
 </body>
 

@@ -22,6 +22,7 @@ from collection import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('collection/', include('collection.urls')),
+    path('messages/', include('django_messages.urls')),
     # todo change admin route
     path('admin/', admin.site.urls),
 ]

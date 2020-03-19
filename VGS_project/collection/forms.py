@@ -1,6 +1,6 @@
 from collection.models import UserData, UserOwnedGame, Games, Compilation,\
     UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon,\
-    UserOwnedGameDLC
+    UserOwnedGameDLC, CollectionPicture
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 from django import forms
@@ -31,6 +31,18 @@ class ChangeAvatarForm(forms.ModelForm):
         fields = ["profil_picture"]
         widgets = {
             "profil_picture": forms.FileInput(attrs={
+                "class": "form-control"}),
+        }
+
+class AddPhotosForm(forms.ModelForm):
+
+    class Meta:
+        model = CollectionPicture
+        fields = ["collection_picture", "private"]
+        widgets = {
+            "collection_picture": forms.FileInput(attrs={
+                "class": "form-control size=100"}),
+            "private": forms.CheckboxInput(attrs={
                 "class": "form-control"}),
         }
 
