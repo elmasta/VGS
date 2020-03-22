@@ -26,6 +26,10 @@ class UserLoginForm(forms.Form):
 
 class ChangeAvatarForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(ChangeAvatarForm, self).__init__(*args, **kwargs)
+        self.fields["profil_picture"].required = True
+
     class Meta:
         model = UserData
         fields = ["profil_picture"]
@@ -119,13 +123,6 @@ class GameCreationForm(forms.ModelForm):
                 "class": "form-control", "required": False}),
             "owning_status": forms.Select(attrs={"class": "form-control"}),
         }
-
-#def __init__(self, *args, **kwargs):
-
-#        super(GameModificationForm, self).__init__(*args, **kwargs)
-#        self.fields["game_name"].required = False
-#        self.fields["completion_status"].required = False
-#        self.fields["owning_status"].required = False
 
 class DLCCreationForm(forms.ModelForm):
 
@@ -281,11 +278,30 @@ class PlateformAddonCreationForm(forms.ModelForm):
                 "required": False})
         }
 
-class ParagraphErrorList(ErrorList):
+class ChangePasswordForm(forms.ModelForm):
 
-    def __str__(self):
-        return self.as_divs()
+    def __init__(self, *args, **kwargs):
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+        self.fields["password"].required = True
 
-    def as_divs(self):
-        if not self: return ""
-        return '<div class="errorlist">%s</div>' % ''.join(['<p class="small error">%s</p>' % e for e in self])
+    class Meta:
+        model = User
+        fields = ["password"]
+        widgets = {
+            "password": forms.PasswordInput(attrs={
+                "class": "form-control", "required": True})
+        }
+
+class EmailForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(EmailForm, self).__init__(*args, **kwargs)
+        self.fields["email"].required = True
+
+    class Meta:
+        model = User
+        fields = ["email"]
+        widgets = {
+            "email": forms.EmailInput(attrs={
+                "class": "form-control", "required": True})
+        }

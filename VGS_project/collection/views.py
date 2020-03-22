@@ -11,13 +11,18 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
 from PIL import Image
 
 def index(request):
 
-    return return_index(request, render)
+    #Person.objects.values('optional_first_name').annotate(c=Count('optional_first_name')).order_by('-c')
+    if request.user.is_authenticated:
+        return render(request, "collection/index.html",
+                      request.session["context"])
+    else:
+        return render(request, "collection/index.html")
 
 def login_page(request):
 
@@ -25,7 +30,7 @@ def login_page(request):
     if request.user.is_authenticated:
         return return_index(request, render)
     if request.method == "POST":
-        form = UserLoginForm(request.POST, error_class=ParagraphErrorList)
+        form = UserLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
@@ -49,17 +54,31 @@ def login_page(request):
                     request.session["context"] = user_plateforms(
                         request, UserOwnedGame, Plateform, ELEM)
                     return redirect("index")
-                else:
-                    #todo error message
-                    form = UserLoginForm()
+                context["errors"] = "Vous n'avez pas activé votre compte"
             else:
-                context["errors"] = form.errors.items()
-        else:
-            context["errors"] = form.errors.items()
-    else:
-        form = UserLoginForm()
+                context["errors"] = "Ce pseudo est inconnu"
+    form = UserLoginForm()
     context["form"] = form
     return render(request, "collection/login.html", context)
+
+def ask_email(request):
+
+    context = {}
+    if request.user.is_authenticated:
+        return redirect("index")
+    if request.method == "POST":
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            if User.objects.filter(email=email).exists():
+                mail_subject = "Changez votre mot de passe VGS."
+                template = "collection/acc_change_password.html"
+                send_email(email, template, mail_subject, User)
+                return redirect("login_page")
+            context["errors"] = "Email inconnu"
+    form = EmailForm()
+    context["form"] = form
+    return render(request, "collection/check_email.html", context)
 
 def register_page(request):
 
@@ -67,7 +86,7 @@ def register_page(request):
     if request.user.is_authenticated:
         return redirect("index")
     if request.method == "POST":
-        form = UserCreationForm(request.POST, error_class=ParagraphErrorList)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
             email = form.cleaned_data["email"]
@@ -82,27 +101,12 @@ def register_page(request):
                     password=password,
                     first_name=first_name,
                     is_active=False)
-                user = User.objects.get(email=email)
-                current_site = get_current_site(request)
                 mail_subject = "Activez votre compte VGS."
-                message = render_to_string(
-                    "collection/acc_active_email.html", {
-                        "user": user,
-                        "domain": current_site.domain,
-                        "uid": urlsafe_base64_encode(force_bytes(user.id)),
-                        "token":account_activation_token.make_token(user)
-                    })
-                to_email = EmailMessage(
-                    mail_subject, message, to=[email]
-                )
-                to_email.send()
+                template = "collection/acc_active_email.html"
+                send_email(email, template, mail_subject, User)
                 return redirect("login_page")
-            else:
-                context["inv_errors"] = "Email déjà utilisé"
-        else:
-            context["form_errors"] = form.errors.items()
-    else:
-        form = UserCreationForm()
+            context["errors"] = "Email déjà utilisé ou mot de passe érroné"
+    form = UserCreationForm()
     context["form"] = form
     return render(request, "collection/register.html", context)
 
@@ -116,10 +120,31 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        # todo: send to login
-        return HttpResponse("Thank you for your email confirmation. Now you can login your account.")
-    else:
-        return HttpResponse("Activation link is invalid!")
+        return HttpResponse("Merci, vous pouvez maintenant vous connecter")
+    return HttpResponse("Le lien n'est pas valide")
+
+def forgotten_password(request, uidb64, token):
+
+    if request.user.is_authenticated:
+        return redirect("index")
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(id=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if request.method == "POST":
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["password"] ==\
+                request.POST.get("CheckPassword"):
+                user.set_password(form.cleaned_data["password"])
+                user.save()
+                return redirect("index")
+    if user is not None and account_activation_token.check_token(user, token):
+        form = ChangePasswordForm()
+        return render(
+            request, "collection/forgoten_password.html", {"form": form})
+    return HttpResponse("Le lien n'est pas valide")
 
 def user_logout(request):
 
@@ -146,9 +171,12 @@ def profile_page(request):
                 context = request.session["context"]
                 context["profil_pic"] = user_pic.profil_picture.path
                 request.session["context"] = context
+            elif authenticate(username=request.user.username,
+                              password=request.POST.get("CheckPassword"))\
+                is not None:
+                User.objects.get(id=request.user.id).delete()
+                return redirect("index")
         addprofpicform = ChangeAvatarForm()
-        addcollpicform = AddPhotosForm()
-        photos = CollectionPicture.objects.filter(user=request.user)[:5]
         if request.session["context"]["profil_pic"] is not None:
             user_pic = UserData.objects.get(user=request.user)
         context = {
@@ -156,8 +184,6 @@ def profile_page(request):
             "email": request.session["context"]["email"],
             "name": request.session["context"]["name"],
             "addprofpicform": addprofpicform,
-            "addcollpicform": addcollpicform,
-            "photos": photos,
             "date_joined": request.user.date_joined,
             "profil_pic": request.session["context"]["profil_pic"],
             "platfor_user": request.session["context"]["platfor_user"]
@@ -167,33 +193,40 @@ def profile_page(request):
 
 def user_photos(request):
 
-    #to be finished
     if request.user.is_authenticated:
         if request.method == "POST":
-            #EmployeeDetails.object.get(...).delete()
-
-            pass
-        return render(request, "collection/photo.html")
+            if request.POST.get("photos") is None:
+                form = AddPhotosForm(request.POST, request.FILES)
+                if form.is_valid():
+                    collection_picture = form.cleaned_data[
+                        "collection_picture"]
+                    private = form.cleaned_data["private"]
+                    new_userpicture = CollectionPicture(
+                        user=request.user,
+                        collection_picture=collection_picture,
+                        private=private
+                    )
+                    new_userpicture.save()
+            else:
+                CollectionPicture.objects.get(
+                    id=request.POST.get("photos")).delete()
         addcollpicform = AddPhotosForm()
         photos = CollectionPicture.objects.filter(user=request.user)
-        if request.session["context"]["profil_pic"] is not None:
-            user_pic = UserData.objects.get(user=request.user)
         context = {
             "username": request.session["context"]["username"],
-            "addprofpicform": addprofpicform,
             "addcollpicform": addcollpicform,
             "photos": photos,
-            "date_joined": request.user.date_joined,
             "profil_pic": request.session["context"]["profil_pic"],
             "platfor_user": request.session["context"]["platfor_user"]
         }
-        return render(request, "collection/profile.html", context)
+        return render(request, "collection/photo.html", context)
     return redirect("index")
 
 def add_item(request):
 
     if request.user.is_authenticated:
-        return render(request, "collection/add_item.html", request.session['context'])
+        return render(request, "collection/add_item.html",
+                      request.session['context'])
     return redirect("index")
 
 def add_game(request):

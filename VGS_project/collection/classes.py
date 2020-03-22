@@ -1,15 +1,10 @@
 from collections import Counter
 from operator import itemgetter
-
-def return_index(request, render):
-    """Return the index page with or without the context"""
-
-    #Person.objects.values('optional_first_name').annotate(c=Count('optional_first_name')).order_by('-c')
-    if request.user.is_authenticated:
-        return render(request, "collection/index.html",
-                      request.session["context"])
-    else:
-        return render(request, "collection/index.html")
+from django.core.mail import EmailMessage
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from collection.tokens import account_activation_token
+from django.template.loader import render_to_string
 
 def user_plateforms(request, user_owned_game, plateform, ELEM):
     """Called to refresh the list of officialy owned plateforms. Useful for
@@ -31,3 +26,17 @@ def user_plateforms(request, user_owned_game, plateform, ELEM):
     context = request.session["context"]
     context["platfor_user"] = user_platfor_list
     return context
+
+def send_email(email, template, mail_subject, User):
+
+    user = User.objects.get(email=email)
+    message = render_to_string(
+        template, {
+            "user": user,
+            "uid": urlsafe_base64_encode(force_bytes(user.id)),
+            "token":account_activation_token.make_token(user)
+        })
+    to_email = EmailMessage(
+        mail_subject, message, to=[email]
+    )
+    to_email.send()

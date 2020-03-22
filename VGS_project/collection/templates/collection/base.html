@@ -34,7 +34,7 @@
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-      <img height="100" width="180" src="{% static 'collection/img/base_logo.png' %}">
+      <img height="90" width="165" src="{% static 'collection/img/base_logo.png' %}">
 
       {% if request.user.is_authenticated %}
         <!-- Nav Item - Dashboard -->
@@ -75,7 +75,7 @@
         </li>
   
         <li class="nav-item active">
-          <a class="nav-link" href="{% url 'user_compilations' %}">
+          <a class="nav-link" href="{% url 'user_compilations' '0' %}">
             <span>Mes compilation</span></a>
         </li>
 

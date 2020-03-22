@@ -1,8 +1,11 @@
 import os
+from six import BytesIO
+from PIL import Image
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy
+from django.core.exceptions import ValidationError
 
 def get_adminpic_path(instance, filename):
     """Used for the admin to save pictures on the site"""
@@ -13,6 +16,35 @@ def get_userpic_path(instance, filename):
     """Used for any registered user to save pictures on the site"""
 
     return os.path.join("user_picture", str(instance.user.id), filename)
+
+def validate_picture(picture):
+    file_size = picture.file.size
+    limit_kb = 150
+    if file_size > limit_kb * 1024:
+        raise ValidationError("La taille maximal est de 153 KB")
+
+    if hasattr(picture, "temporary_file_path"):
+        file = picture.temporary_file_path()
+    else:
+        if hasattr(picture, "read"):
+            file = BytesIO(picture.read())
+        else:
+            file = BytesIO(picture["content"])
+    try:
+        im = Image.open(file)
+        if im.format not in ("PNG", "JPEG"):
+            raise ValidationError("Cette image n'est pas un png ou jpeg")
+    except ImportError:
+        # Under PyPy, it is possible to import PIL. However, the underlying
+        # _imaging C module isn't available, so an ImportError will be
+        # raised. Catch and re-raise.
+        raise
+    except Exception: # Python Imaging Library doesn't recognize it as an image
+        raise ValidationError("Ce fichier n'est pas une image")
+
+    #limit_mb = 8
+    #if file_size > limit_mb * 1024 * 1024:
+    #    raise ValidationError("Max size of file is %s MB" % limit_mb)
 
 class Condition(models.IntegerChoices):
 
@@ -51,7 +83,7 @@ class UserData(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profil_picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                       null=True)
+                                       null=True, validators=[validate_picture])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -92,7 +124,8 @@ class CollectionPicture(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     collection_picture = models.ImageField(upload_to=get_userpic_path,
                                            blank=True,
-                                           null=True)
+                                           null=True,
+                                           validators=[validate_picture])
     private = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -196,7 +229,7 @@ class UserOwnedCompilation(models.Model):
                                      on_delete=models.CASCADE)
     physical = models.BooleanField()
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                null=True)
+                                null=True, validators=[validate_picture])
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
     covers_condition = models.IntegerField(choices=Condition.choices,
@@ -232,7 +265,7 @@ class UserOwnedGame(models.Model):
                                     null=True, on_delete=models.CASCADE)
     physical = models.BooleanField()
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                null=True)
+                                null=True, validators=[validate_picture])
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
     covers_condition = models.IntegerField(choices=Condition.choices,
@@ -272,7 +305,7 @@ class UserOwnedGameDLC(models.Model):
     gamedlc_name = models.CharField(max_length=200)
     physical = models.BooleanField()
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                null=True)
+                                null=True, validators=[validate_picture])
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
     covers_condition = models.IntegerField(choices=Condition.choices,
@@ -294,7 +327,7 @@ class UserOwnedSubPlateform(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subplateform = models.ForeignKey(SubPlateform, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                null=True)
+                                null=True, validators=[validate_picture])
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
     manual_condition = models.IntegerField(choices=Condition.choices,
@@ -311,7 +344,7 @@ class UserOwnedPlateformAddon(models.Model):
     plateformaddon = models.ForeignKey(PlateformAddon,
                                        on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                null=True)
+                                null=True, validators=[validate_picture])
     box_condition = models.IntegerField(choices=Condition.choices,
                                         blank=True, null=True)
     manual_condition = models.IntegerField(choices=Condition.choices,
