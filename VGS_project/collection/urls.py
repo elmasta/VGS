@@ -22,6 +22,7 @@ urlpatterns = [
     path('user_consoles_page/<consoles_id>', views.user_consoles_page, name='user_consoles_page'),
     path('user_compilations/', views.user_compilations, name='user_compilations'),
     path('user_compilations_page/<compilations_id>', views.user_compilations_page, name='user_compilations_page'),
+    path('user_dlc_page/<dlc_id>', views.user_dlc_page, name='user_dlc_page'),
     re_path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
             views.activate, name='activate'),
     re_path(r'^forgotten_password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',

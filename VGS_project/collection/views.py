@@ -193,7 +193,6 @@ def user_photos(request):
         if request.method == "POST":
             if request.POST.get("photos") is None:
                 form = AddPhotosForm(request.POST, request.FILES)
-                print(request.FILES)
                 if form.is_valid():
                     collection_picture = form.cleaned_data[
                         "collection_picture"]
@@ -460,6 +459,9 @@ def user_game_page(request, game_id):
                     request, UserOwnedGame, Plateform, ELEM
                 )
                 return redirect("user_collection", plateform_id=0)
+        user_dlc = UserOwnedGameDLC.objects.filter(
+            gameowned_id=user_game.id
+        )
         form = GameCreationForm(instance=user_game)
         context = {
             "username": request.session["context"]["username"],
@@ -468,6 +470,7 @@ def user_game_page(request, game_id):
             "form": form,
             "modify": True,
             "user_game": user_game,
+            "user_dlc": user_dlc,
             "profil_pic": request.session["context"]["profil_pic"],
             "platfor_user": request.session["context"]["platfor_user"]
         }
@@ -482,7 +485,6 @@ def user_accessory(request):
         )
         context = request.session['context']
         context["user_plateform_addon"] = user_plateform_addon
-        print(user_plateform_addon)
         return render(
             request, "collection/accessory_collection.html", context)
     return redirect("index")
@@ -550,7 +552,6 @@ def user_consoles_page(request, consoles_id):
             if request.POST.get("delete") is None:
                 form = PlateformCreationForm(
                     request.POST, request.FILES)
-                print(request.POST)
                 if form.is_valid():
                     picture = form.cleaned_data["picture"]
                     user_plat.subplateform =\
@@ -642,9 +643,64 @@ def user_compilations_page(request, compilations_id):
             "email": request.session["context"]["email"],
             "name": request.session["context"]["name"],
             "form": form,
-            "user_game": user_comp,
+            "modify": True,
+            "user_comp": user_comp,
             "profil_pic": request.session["context"]["profil_pic"],
             "platfor_user": request.session["context"]["platfor_user"]
         }
         return render(request, "collection/add_comp.html", context)
+    return redirect("index")
+
+def user_dlc_page(request, dlc_id):
+
+    if request.user.is_authenticated:
+        user_dlc = get_object_or_404(
+            UserOwnedGameDLC.objects.filter(
+                id=dlc_id))
+        if request.method == "POST":
+            if request.POST.get("delete") is None:
+                form = DLCCreationForm(
+                    request.POST, request.FILES)
+                if form.is_valid():
+                    user_dlc.gameowned_id = form.cleaned_data[
+                        "gameowned_id"]
+                    user_dlc.gamedlc_id = form.cleaned_data[
+                        "gamedlc_id"]
+                    user_dlc.gamedlc_name = form.cleaned_data[
+                        "gamedlc_name"]
+                    user_dlc.physical = form.cleaned_data["physical"]
+                    user_dlc.picture = form.cleaned_data["picture"]
+                    user_dlc.box_condition = form.cleaned_data[
+                        "box_condition"]
+                    user_dlc.covers_condition = form.cleaned_data[
+                        "covers_condition"]
+                    user_dlc.manual_condition = form.cleaned_data[
+                        "manual_condition"]
+                    user_dlc.gamedlc_condition = form.cleaned_data[
+                        "gamedlc_condition"]
+                    user_dlc.condition_precision = form.cleaned_data[
+                        "condition_precision"]
+                    user_dlc.rating = form.cleaned_data["rating"]
+                    user_dlc.rating_precision = form.cleaned_data[
+                        "rating_precision"]
+                    user_dlc.owning_status = form.cleaned_data[
+                        "owning_status"]
+                    user_dlc.save()
+            else:
+                UserOwnedGameDLC.objects.get(
+                    id=request.POST.get("delete")).delete()
+                return redirect("user_game_page", game_id=form.cleaned_data[
+                    "gameowned_id"])
+        form = DLCCreationForm(instance=user_dlc)
+        context = {
+            "username": request.session["context"]["username"],
+            "email": request.session["context"]["email"],
+            "name": request.session["context"]["name"],
+            "form": form,
+            "modify": True,
+            "user_dlc": user_dlc,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
+        return render(request, "collection/add_DLC.html", context)
     return redirect("index")

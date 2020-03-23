@@ -295,6 +295,7 @@ class UserOwnedGame(models.Model):
 
 class UserOwnedGameDLC(models.Model):
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     gameowned_id = models.ForeignKey(UserOwnedGame, on_delete=models.CASCADE)
     #either id from Games table (game_id) or name if it's a made up game from
     #the user

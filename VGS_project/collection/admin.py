@@ -1,7 +1,8 @@
 from django.contrib import admin
 from collection.models import Plateform, SubPlateform, PlateformAddon,\
     Compilation, Games, GameDLC, UserData, UserOwnedGame,\
-    UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon
+    UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon,\
+    UserOwnedGameDLC
 
 @admin.register(Plateform)
 class PlateformAdmin(admin.ModelAdmin):
@@ -47,3 +48,8 @@ class UserOwnedSubPlateformAdmin(admin.ModelAdmin):
 @admin.register(UserOwnedPlateformAddon)
 class UserOwnedPlateformAddonAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(UserOwnedGameDLC)
+class UserOwnedGameDLCAdmin(admin.ModelAdmin):
+    pass
+
