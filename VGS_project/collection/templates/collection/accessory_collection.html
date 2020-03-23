@@ -6,7 +6,7 @@
 
 <div class="card shadow mb-4">
   <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">Liste des jeux</h6>
+    <h6 class="m-0 font-weight-bold text-primary">Liste des accessoires</h6>
   </div>
   <div class="card-body">
     <div class="table-responsive">
@@ -15,23 +15,15 @@
           <tr>
             <th>Nom</th>
             <th>Plateforme - Région</th>
-            <th>Complétions</th>
-            <th>Note</th>
-            <th>Page du jeu</th>
+            <th>Page de l'accessoire</th>
           </tr>
         </thead>
         <tbody>
-          {% for item in game_set %}
+          {% for item in user_plateform_addon %}
             <tr>
-              <td>{{ item.game_name }}</td>
-              <td>{{ item.plateform_id }}</td>
-              <td>{{ item.completion_status }}</td>
-              {% if item.rating is None %}
-                <td>-</td>
-              {% else %}
-                <td>{{ item.rating }}</td>
-              {% endif %}
-              <td><a href="{% url 'user_game_page' game_id=item.id %}">lien</a></td>
+              <td>{{ item.plateformaddon.name }}</td>
+              <td>{{ item.plateformaddon.plateform }}</td>
+              <td><a href="{% url 'user_accessory_page' accessory_id=item.id %}">lien</a></td>
             </tr>
           {% endfor %}
         </tbody>

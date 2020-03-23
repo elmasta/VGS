@@ -6,20 +6,47 @@
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-xl-2 col-lg-2"></div>
-    <div class="col-xl-8 col-lg-8">
-      <div class="card shadow mb-4">
-        <!-- Card Body -->
-        <div class="row mt-4">
-          <div class="col-xl-1 col-lg-1"></div>
-          <div class="col-xl-9 col-lg-1">
-            <div class="align-items-center justify-content-center text-center">
-              <h4 class="text-uppercase font-weight-bold mt-4">Formulaire d'ajout de plateforme</h4>
+  {% if modify %}
+    <div class="row">
+      <div class="col-xl-2 col-lg-2"></div>
+      <div class="col-xl-8 col-lg-8">
+        <div class="card shadow mb-4">
+          <div class="row mt-4 mb-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-1 my-auto">
+              <h4 class="text-uppercase font-weight-bold mt-4">{{ user_access.plateformaddon }}</h4>
+            </div>
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-4">
+              {% if not user_access.picture %}
+                <img class="img-fluid" alt="Responsive image" src="{% static user_access.plateformaddon.picture.path %}">
+              {% else %}
+                <img class="img-fluid" alt="Responsive image" src="{% static user_access.picture.path %}">
+              {% endif %}
             </div>
           </div>
         </div>
-        <form class="user" method="post">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-2 col-lg-2"></div>
+      <div class="col-xl-8 col-lg-8">
+        <div class="card shadow mb-4">
+  {% else %}
+    <div class="row">
+      <div class="col-xl-2 col-lg-2"></div>
+      <div class="col-xl-8 col-lg-8">
+        <div class="card shadow mb-4">
+          <div class="row mt-4">
+            <div class="col-xl-1 col-lg-1"></div>
+            <div class="col-xl-9 col-lg-1">
+              <div class="align-items-center justify-content-center text-center">
+                <h4 class="text-uppercase font-weight-bold mt-4">Formulaire d'ajout d'un accessoire</h4>
+              </div>
+            </div>
+          </div>
+  {% endif %}
+        <form class="user" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row mt-4">
             <div class="col-xl-1 col-lg-1"></div>
@@ -44,7 +71,7 @@
               <div class="form-group ml-4">
                 <label class="control-label">Image</label>
                 {{ form.picture }}
-                <i class="fas fa-sm mr-2 text-gray-500">Facultatif, PNG ou JPEG 153KB max</i>
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif, PNG ou JPEG 1MB max</i>
               </div>
             </div>
           </div>
@@ -76,12 +103,19 @@
             </div>
           </div>
           <div class="row mt-4 pt-5 mb-4">
-            <div class="col-xl-5 col-lg-1"></div>
+            <div class="col-xl-4 col-lg-1"></div>
             <div class="col-xl-2 col-lg-1">
               <div class="align-items-center justify-content-center text-center">
                 <button type="submit" class="btn btn-primary">Sauvegarder</button>
               </div>
             </div>
+            {% if modify %}
+              <div class="col-xl-2 col-lg-1">
+                <div class="align-items-center justify-content-center text-center">
+                  <button type="submit" name="delete" value="{{ user_game.id }}" class="btn btn-danger">Supprimer</button>
+                </div>
+              </div>
+            {% endif %}
           </div>
         </form>
       </div>

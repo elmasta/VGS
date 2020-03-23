@@ -19,7 +19,7 @@
             </div>
           </div>
         </div>
-        <form class="user" method="post">
+        <form class="user" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row mt-4">
             <div class="col-xl-1 col-lg-1"></div>
@@ -63,7 +63,7 @@
               <div class="form-group ml-4">
                 <label class="control-label">Image</label>
                 {{ form.picture }}
-                <i class="fas fa-sm mr-2 text-gray-500">Facultatif, PNG ou JPEG 153KB max</i>
+                <i class="fas fa-sm mr-2 text-gray-500">Facultatif, 1MB max</i>
               </div>
             </div>
           </div>

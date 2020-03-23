@@ -19,10 +19,8 @@ def get_userpic_path(instance, filename):
 
 def validate_picture(picture):
     file_size = picture.file.size
-    limit_kb = 150
-    if file_size > limit_kb * 1024:
-        raise ValidationError("La taille maximal est de 153 KB")
-
+    if file_size > 10000000:
+        raise ValidationError("La taille maximal est de 1 MB")
     if hasattr(picture, "temporary_file_path"):
         file = picture.temporary_file_path()
     else:
@@ -41,10 +39,6 @@ def validate_picture(picture):
         raise
     except Exception: # Python Imaging Library doesn't recognize it as an image
         raise ValidationError("Ce fichier n'est pas une image")
-
-    #limit_mb = 8
-    #if file_size > limit_mb * 1024 * 1024:
-    #    raise ValidationError("Max size of file is %s MB" % limit_mb)
 
 class Condition(models.IntegerChoices):
 
@@ -154,6 +148,10 @@ class PlateformAddon(models.Model):
     class Meta:
 
         ordering = ('name',)
+
+    def __str__(self):
+
+        return self.name + " - " + str(self.plateform)
 
     plateform = models.ForeignKey(Plateform, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)

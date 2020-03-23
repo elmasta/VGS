@@ -1,4 +1,4 @@
-from collection.classes import *
+from collection.func import *
 from collection.forms import *
 from collection.tokens import account_activation_token
 from collection.models import UserData, Games, UserOwnedGame, Plateform,\
@@ -6,14 +6,10 @@ from collection.models import UserData, Games, UserOwnedGame, Plateform,\
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
-from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template import loader
-from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
-from PIL import Image
 
 def index(request):
 
@@ -28,7 +24,7 @@ def login_page(request):
 
     context = {}
     if request.user.is_authenticated:
-        return return_index(request, render)
+        return redirect("index")
     if request.method == "POST":
         form = UserLoginForm(request.POST)
         if form.is_valid():
@@ -197,6 +193,7 @@ def user_photos(request):
         if request.method == "POST":
             if request.POST.get("photos") is None:
                 form = AddPhotosForm(request.POST, request.FILES)
+                print(request.FILES)
                 if form.is_valid():
                     collection_picture = form.cleaned_data[
                         "collection_picture"]
@@ -233,67 +230,51 @@ def add_game(request):
 
     if request.user.is_authenticated:
         if request.method == "POST":
+
             form = GameCreationForm(
                 request.POST, request.FILES, current_user=request.user)
             if form.is_valid():
                 game_id = form.cleaned_data["game_id"]
-                game_name = form.cleaned_data["game_name"]
                 if game_id is None:
                     plateform_id = form.cleaned_data["plateform_id"]
                 else:
                     game_item = get_object_or_404(
                         Games.objects.filter(id=game_id.id))
                     plateform_id = game_item.plateform
-                compilation = form.cleaned_data["compilation"]
-                physical = form.cleaned_data["physical"]
-                picture = form.cleaned_data["picture"]
-                box_condition = form.cleaned_data["box_condition"]
-                covers_condition = form.cleaned_data["covers_condition"]
-                manual_condition = form.cleaned_data["manual_condition"]
-                game_condition = form.cleaned_data["game_condition"]
-                condition_precision = form.cleaned_data["condition_precision"]
-                rating = form.cleaned_data["rating"]
-                rating_precision = form.cleaned_data["rating_precision"]
-                never_played = form.cleaned_data["never_played"]
-                completion_status = form.cleaned_data["completion_status"]
-                completion_precision = form.cleaned_data[
-                    "completion_precision"]
-                achievements_earned = form.cleaned_data["achievements_earned"]
-                achievements_to_be_earned = form.cleaned_data[
-                    "achievements_to_be_earned"]
-                owning_status = form.cleaned_data["owning_status"]
                 new_game = UserOwnedGame(
                     user=request.user,
                     game_id=game_id,
-                    game_name=game_name,
+                    game_name=form.cleaned_data["game_name"],
                     plateform_id=plateform_id,
-                    compilation=compilation,
-                    physical=physical,
-                    picture=picture,
-                    box_condition=box_condition,
-                    covers_condition=covers_condition,
-                    manual_condition=manual_condition,
-                    game_condition=game_condition,
-                    condition_precision=condition_precision,
-                    rating=rating,
-                    rating_precision=rating_precision,
-                    never_played=never_played,
-                    completion_status=completion_status,
-                    completion_precision=completion_precision,
-                    achievements_earned=achievements_earned,
-                    achievements_to_be_earned=achievements_to_be_earned,
-                    owning_status=owning_status
+                    compilation=form.cleaned_data["compilation"],
+                    physical=form.cleaned_data["physical"],
+                    picture=form.cleaned_data["picture"],
+                    box_condition=form.cleaned_data["box_condition"],
+                    covers_condition=form.cleaned_data["covers_condition"],
+                    manual_condition=form.cleaned_data["manual_condition"],
+                    game_condition=form.cleaned_data["game_condition"],
+                    condition_precision=form.cleaned_data[
+                        "condition_precision"],
+                    rating=form.cleaned_data["rating"],
+                    rating_precision=form.cleaned_data["rating_precision"],
+                    never_played=form.cleaned_data["never_played"],
+                    completion_status=form.cleaned_data["completion_status"],
+                    completion_precision=form.cleaned_data[
+                        "completion_precision"],
+                    achievements_earned=form.cleaned_data[
+                        "achievements_earned"],
+                    achievements_to_be_earned=form.cleaned_data[
+                        "achievements_to_be_earned"],
+                    owning_status=form.cleaned_data["owning_status"]
                     )
                 new_game.save()
                 request.session["context"] = user_plateforms(
                     request, UserOwnedGame, Plateform, ELEM
                 )
-                return redirect("add_game")
-        else:
-            context = request.session['context']
-            form = GameCreationForm()
-            context["form"] = form
-            return render(request, "collection/add_game.html", context)
+        context = request.session['context']
+        form = GameCreationForm()
+        context["form"] = form
+        return render(request, "collection/add_game.html", context)
     return redirect("index")
 
 def add_DLC(request):
@@ -303,45 +284,28 @@ def add_DLC(request):
             form = DLCCreationForm(
                 request.POST, request.FILES, current_user=request.user)
             if form.is_valid():
-                gameowned_id = form.cleaned_data["gameowned_id"]
-                gamedlc_id = form.cleaned_data["gamedlc_id"]
-                gamedlc_name = form.cleaned_data["gamedlc_name"]
-                physical = form.cleaned_data["physical"]
-                picture = form.cleaned_data["picture"]
-                box_condition = form.cleaned_data["box_condition"]
-                covers_condition = form.cleaned_data["covers_condition"]
-                manual_condition = form.cleaned_data["manual_condition"]
-                gamedlc_condition = form.cleaned_data["gamedlc_condition"]
-                condition_precision = form.cleaned_data["condition_precision"]
-                rating = form.cleaned_data["rating"]
-                rating_precision = form.cleaned_data["rating_precision"]
-                owning_status = form.cleaned_data["owning_status"]
                 new_dlc = UserOwnedGameDLC(
                     user=request.user,
-                    gameowned_id=gameowned_id,
-                    gamedlc_id=gamedlc_id,
-                    gamedlc_name=gamedlc_name,
-                    physical=physical,
-                    picture=picture,
-                    box_condition=box_condition,
-                    covers_condition=covers_condition,
-                    manual_condition=manual_condition,
-                    gamedlc_condition=gamedlc_condition,
-                    condition_precision=condition_precision,
-                    rating=rating,
-                    rating_precision=rating_precision,
-                    owning_status=owning_status
+                    gameowned_id=form.cleaned_data["gameowned_id"],
+                    gamedlc_id=form.cleaned_data["gamedlc_id"],
+                    gamedlc_name=form.cleaned_data["gamedlc_name"],
+                    physical=form.cleaned_data["physical"],
+                    picture=form.cleaned_data["picture"],
+                    box_condition=form.cleaned_data["box_condition"],
+                    covers_condition=form.cleaned_data["covers_condition"],
+                    manual_condition=form.cleaned_data["manual_condition"],
+                    gamedlc_condition=form.cleaned_data["gamedlc_condition"],
+                    condition_precision=form.cleaned_data[
+                        "condition_precision"],
+                    rating=form.cleaned_data["rating"],
+                    rating_precision=form.cleaned_data["rating_precision"],
+                    owning_status=form.cleaned_data["owning_status"]
                     )
                 new_dlc.save()
-                request.session["context"] = user_plateforms(
-                    request, UserOwnedGame, Plateform, ELEM
-                )
-                return render(request, "collection/collection.html", request.session["context"])
-        else:
-            context = request.session['context']
-            form = DLCCreationForm(current_user=request.user)
-            context["form"] = form
-            return render(request, "collection/add_DLC.html", context)
+        context = request.session['context']
+        form = DLCCreationForm(current_user=request.user)
+        context["form"] = form
+        return render(request, "collection/add_DLC.html", context)
     return redirect("index")
 
 def add_comp(request):
@@ -351,43 +315,32 @@ def add_comp(request):
             form = CompilCreationForm(request.POST, request.FILES)
             if form.is_valid():
                 compilation_id = form.cleaned_data["compilation_id"]
-                compilation_name = form.cleaned_data["compilation_name"]
                 if compilation_id is None:
                     plateform_id = form.cleaned_data["plateform_id"]
                 else:
                     plateform_id = get_object_or_404(
                         Compilation.objects.filter(id=compilation_id.id))
                     plateform_id = plateform_id.plateform
-                physical = form.cleaned_data["physical"]
-                picture = form.cleaned_data["picture"]
-                box_condition = form.cleaned_data["box_condition"]
-                covers_condition = form.cleaned_data["covers_condition"]
-                manual_condition = form.cleaned_data["manual_condition"]
-                game_condition = form.cleaned_data["game_condition"]
-                condition_precision = form.cleaned_data["condition_precision"]
-                owning_status = form.cleaned_data["owning_status"]
                 new_comp = UserOwnedCompilation(
                     user=request.user,
                     compilation_id=compilation_id,
-                    compilation_name=compilation_name,
+                    compilation_name=form.cleaned_data["compilation_name"],
                     plateform_id=plateform_id,
-                    physical=physical,
-                    picture=picture,
-                    box_condition=box_condition,
-                    covers_condition=covers_condition,
-                    manual_condition=manual_condition,
-                    game_condition=game_condition,
-                    condition_precision=condition_precision,
-                    owning_status=owning_status
+                    physical=form.cleaned_data["physical"],
+                    picture=form.cleaned_data["picture"],
+                    box_condition=form.cleaned_data["box_condition"],
+                    covers_condition=form.cleaned_data["covers_condition"],
+                    manual_condition=form.cleaned_data["manual_condition"],
+                    game_condition=form.cleaned_data["game_condition"],
+                    condition_precision=form.cleaned_data[
+                        "condition_precision"],
+                    owning_status=form.cleaned_data["owning_status"]
                     )
                 new_comp.save()
-                #todo return to comp page
-                return return_index(request, render)
-        else:
-            context = request.session['context']
-            form = CompilCreationForm()
-            context["form"] = form
-            return render(request, "collection/add_comp.html", context)
+        context = request.session['context']
+        form = CompilCreationForm()
+        context["form"] = form
+        return render(request, "collection/add_comp.html", context)
     return redirect("index")
 
 def add_console(request):
@@ -396,30 +349,22 @@ def add_console(request):
         if request.method == "POST":
             form = PlateformCreationForm(request.POST, request.FILES)
             if form.is_valid():
-                subplateform = form.cleaned_data["subplateform"]
-                picture = form.cleaned_data["picture"]
-                box_condition = form.cleaned_data["box_condition"]
-                manual_condition = form.cleaned_data["manual_condition"]
-                subplateform_condition = form.cleaned_data[
-                    "subplateform_condition"]
-                condition_precision = form.cleaned_data["condition_precision"]
                 new_plat = UserOwnedSubPlateform(
                     user=request.user,
-                    subplateform=subplateform,
-                    picture=picture,
-                    box_condition=box_condition,
-                    manual_condition=manual_condition,
-                    subplateform_condition=subplateform_condition,
-                    condition_precision=condition_precision
+                    subplateform=form.cleaned_data["subplateform"],
+                    picture=form.cleaned_data["picture"],
+                    box_condition=form.cleaned_data["box_condition"],
+                    manual_condition=form.cleaned_data["manual_condition"],
+                    subplateform_condition=form.cleaned_data[
+                        "subplateform_condition"],
+                    condition_precision=form.cleaned_data[
+                        "condition_precision"]
                     )
                 new_plat.save()
-                #todo return to plateform list page
-                return return_index(request, render)
-        else:
-            context = request.session['context']
-            form = PlateformCreationForm()
-            context["form"] = form
-            return render(request, "collection/add_console.html", context)
+        context = request.session['context']
+        form = PlateformCreationForm()
+        context["form"] = form
+        return render(request, "collection/add_console.html", context)
     return redirect("index")
 
 def add_addon(request):
@@ -428,30 +373,22 @@ def add_addon(request):
         if request.method == "POST":
             form = PlateformAddonCreationForm(request.POST, request.FILES)
             if form.is_valid():
-                plateformaddon = form.cleaned_data["plateformaddon"]
-                picture = form.cleaned_data["picture"]
-                box_condition = form.cleaned_data["box_condition"]
-                manual_condition = form.cleaned_data["manual_condition"]
-                plateformaddon_condition = form.cleaned_data[
-                    "plateformaddon_condition"]
-                condition_precision = form.cleaned_data["condition_precision"]
                 new_addon = UserOwnedPlateformAddon(
                     user=request.user,
-                    plateformaddon=plateformaddon,
-                    picture=picture,
-                    box_condition=box_condition,
-                    manual_condition=manual_condition,
-                    plateformaddon_condition=plateformaddon_condition,
-                    condition_precision=condition_precision
+                    plateformaddon=form.cleaned_data["plateformaddon"],
+                    picture=form.cleaned_data["picture"],
+                    box_condition=form.cleaned_data["box_condition"],
+                    manual_condition=form.cleaned_data["manual_condition"],
+                    plateformaddon_condition=form.cleaned_data[
+                        "plateformaddon_condition"],
+                    condition_precision=form.cleaned_data[
+                        "condition_precision"]
                     )
                 new_addon.save()
-                #todo return to accessory list page
-                return return_index(request, render)
-        else:
-            context = request.session['context']
-            form = PlateformAddonCreationForm()
-            context["form"] = form
-            return render(request, "collection/add_addon.html", context)
+        context = request.session['context']
+        form = PlateformAddonCreationForm()
+        context["form"] = form
+        return render(request, "collection/add_addon.html", context)
     return redirect("index")
 
 def user_collection(request, plateform_id):
@@ -469,76 +406,7 @@ def user_collection(request, plateform_id):
         game_set = []
         for item in user_games:
             item.completion_status = finished_litteral[item.completion_status
-                 - 1]
-            game_set.append(item)
-        context = request.session['context']
-        context["game_set"] = game_set
-        return render(request, "collection/collection.html", context)
-    return redirect("index")
-
-def user_accessory(request, plateform_id):
-
-    #to be done
-    if request.user.is_authenticated:
-        if plateform_id == "0" or plateform_id.isdigit() is False:
-            user_games = UserOwnedGame.objects.filter(user=request.user)
-        else:
-            user_games = UserOwnedGame.objects.filter(
-                plateform_id=plateform_id,
-                user=request.user
-                )
-        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
-                             "N'a pas de fin", "Abandonné"]
-        game_set = []
-        for item in user_games:
-            item.completion_status = finished_litteral[item.completion_status
-                 - 1]
-            game_set.append(item)
-        context = request.session['context']
-        context["game_set"] = game_set
-        return render(request, "collection/collection.html", context)
-    return redirect("index")
-
-def user_consoles(request, plateform_id):
-
-    #to be done
-    if request.user.is_authenticated:
-        if plateform_id == "0" or plateform_id.isdigit() is False:
-            user_games = UserOwnedGame.objects.filter(user=request.user)
-        else:
-            user_games = UserOwnedGame.objects.filter(
-                plateform_id=plateform_id,
-                user=request.user
-                )
-        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
-                             "N'a pas de fin", "Abandonné"]
-        game_set = []
-        for item in user_games:
-            item.completion_status = finished_litteral[item.completion_status
-                 - 1]
-            game_set.append(item)
-        context = request.session['context']
-        context["game_set"] = game_set
-        return render(request, "collection/collection.html", context)
-    return redirect("index")
-
-def user_compilations(request, plateform_id):
-
-    #to be done
-    if request.user.is_authenticated:
-        if plateform_id == "0" or plateform_id.isdigit() is False:
-            user_games = UserOwnedGame.objects.filter(user=request.user)
-        else:
-            user_games = UserOwnedGame.objects.filter(
-                plateform_id=plateform_id,
-                user=request.user
-                )
-        finished_litteral = ["Pas fini", "Fini", "Fini à 100%",
-                             "N'a pas de fin", "Abandonné"]
-        game_set = []
-        for item in user_games:
-            item.completion_status = finished_litteral[item.completion_status
-                 - 1]
+                                                       - 1]
             game_set.append(item)
         context = request.session['context']
         context["game_set"] = game_set
@@ -547,63 +415,236 @@ def user_compilations(request, plateform_id):
 
 def user_game_page(request, game_id):
 
-    #to be done
     if request.user.is_authenticated:
-        if request.method == "POST":
-            user_game = get_object_or_404(UserOwnedGame.objects.filter(
-                id=game_id, user=request.user))
-            form = GameModificationForm(request.POST, request.FILES)
-            if form.is_valid():
-                if form.cleaned_data["game_id"] is not None:
-                    if user_game.game_id is None:
-                        user_game.plateform_id = form.cleaned_data[
-                            "plateform_id"]
-                else:
-                    user_game.game_id = form.cleaned_data["game_id"]
-                    plateform_id = get_object_or_404(
-                        Games.objects.filter(id=user_game.game_id.id))
-                    user_game.plateform_id = plateform_id.plateform
-                user_game.game_name = form.cleaned_data["game_name"]
-                user_game.compilation = form.cleaned_data["compilation"]
-                user_game.physical = form.cleaned_data["physical"]
-                user_game.picture = form.cleaned_data["picture"]
-                user_game.box_condition = form.cleaned_data[
-                    "box_condition"]
-                user_game.covers_condition = form.cleaned_data[
-                    "covers_condition"]
-                user_game.manual_condition = form.cleaned_data[
-                    "manual_condition"]
-                user_game.game_condition = form.cleaned_data[
-                    "game_condition"]
-                user_game.condition_precision = form.cleaned_data[
-                    "condition_precision"]
-                user_game.rating = form.cleaned_data["rating"]
-                user_game.rating_precision = form.cleaned_data[
-                    "rating_precision"]
-                user_game.never_played = form.cleaned_data["never_played"]
-                user_game.completion_status = form.cleaned_data[
-                    "completion_status"]
-                user_game.completion_precision = form.cleaned_data[
-                    "completion_precision"]
-                user_game.achievements_earned = form.cleaned_data[
-                    "achievements_earned"]
-                user_game.achievements_to_be_earned = form.cleaned_data[
-                    "achievements_to_be_earned"]
-                user_game.owning_status = form.cleaned_data[
-                    "owning_status"]
-                user_game.save()
         user_game = get_object_or_404(UserOwnedGame.objects.filter(
             id=game_id, user=request.user))
-        form = GameModificationForm()
+        if request.method == "POST":
+            if request.POST.get("delete") is None:
+                form = GameCreationForm(
+                    request.POST, request.FILES, current_user=request.user)
+                if form.is_valid():
+                    user_game.game_id = form.cleaned_data["game_id"]
+                    user_game.game_name = form.cleaned_data["game_name"]
+                    if game_id is None:
+                        user_game.plateform_id = form.cleaned_data["plateform_id"]
+                    else:
+                        game_item = get_object_or_404(
+                            Games.objects.filter(id=user_game.game_id.id))
+                        user_game.plateform_id = game_item.plateform
+                    user_game.compilation = form.cleaned_data["compilation"]
+                    user_game.physical = form.cleaned_data["physical"]
+                    user_game.picture = form.cleaned_data["picture"]
+                    user_game.box_condition = form.cleaned_data["box_condition"]
+                    user_game.covers_condition = form.cleaned_data["covers_condition"]
+                    user_game.manual_condition = form.cleaned_data["manual_condition"]
+                    user_game.game_condition = form.cleaned_data["game_condition"]
+                    user_game.condition_precision = form.cleaned_data["condition_precision"]
+                    user_game.rating = form.cleaned_data["rating"]
+                    user_game.rating_precision = form.cleaned_data["rating_precision"]
+                    user_game.never_played = form.cleaned_data["never_played"]
+                    user_game.completion_status = form.cleaned_data["completion_status"]
+                    user_game.completion_precision = form.cleaned_data[
+                        "completion_precision"]
+                    user_game.achievements_earned = form.cleaned_data["achievements_earned"]
+                    user_game.achievements_to_be_earned = form.cleaned_data[
+                        "achievements_to_be_earned"]
+                    user_game.owning_status = form.cleaned_data["owning_status"]
+                    user_game.save()
+                    request.session["context"] = user_plateforms(
+                        request, UserOwnedGame, Plateform, ELEM
+                    )
+            else:
+                UserOwnedGame.objects.get(
+                    id=request.POST.get("delete")).delete()
+                request.session["context"] = user_plateforms(
+                    request, UserOwnedGame, Plateform, ELEM
+                )
+                return redirect("user_collection", plateform_id=0)
+        form = GameCreationForm(instance=user_game)
         context = {
             "username": request.session["context"]["username"],
             "email": request.session["context"]["email"],
             "name": request.session["context"]["name"],
             "form": form,
+            "modify": True,
             "user_game": user_game,
             "profil_pic": request.session["context"]["profil_pic"],
             "platfor_user": request.session["context"]["platfor_user"]
         }
-        return render(request, "collection/game_page.html", context)
-    else:
-        return return_index(request, render)
+        return render(request, "collection/add_game.html", context)
+    return redirect("index")
+
+def user_accessory(request):
+
+    if request.user.is_authenticated:
+        user_plateform_addon = UserOwnedPlateformAddon.objects.filter(
+            user=request.user
+        )
+        context = request.session['context']
+        context["user_plateform_addon"] = user_plateform_addon
+        print(user_plateform_addon)
+        return render(
+            request, "collection/accessory_collection.html", context)
+    return redirect("index")
+
+def user_accessory_page(request, accessory_id):
+
+    if request.user.is_authenticated:
+        user_access = get_object_or_404(
+            UserOwnedPlateformAddon.objects.filter(
+                id=accessory_id, user=request.user))
+        if request.method == "POST":
+            if request.POST.get("delete") is None:
+                form = PlateformAddonCreationForm(
+                    request.POST, request.FILES)
+                if form.is_valid():
+                    user_access.plateformaddon =\
+                        form.cleaned_data["plateformaddon"]
+                    user_access.picture = form.cleaned_data["picture"]
+                    user_access.box_condition =\
+                        form.cleaned_data["box_condition"]
+                    user_access.manual_condition =\
+                        form.cleaned_data["manual_condition"]
+                    user_access.plateformaddon_condition =\
+                        form.cleaned_data["plateformaddon_condition"]
+                    user_access.condition_precision =\
+                        form.cleaned_data["condition_precision"]
+                    user_access.save()
+            else:
+                UserOwnedPlateformAddon.objects.get(
+                    id=request.POST.get("delete")).delete()
+                return redirect("user_accessory")
+        form = PlateformAddonCreationForm(instance=user_access)
+        context = {
+            "username": request.session["context"]["username"],
+            "email": request.session["context"]["email"],
+            "name": request.session["context"]["name"],
+            "form": form,
+            "modify": True,
+            "user_access": user_access,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
+        return render(request, "collection/add_addon.html", context)
+    return redirect("index")
+
+def user_consoles(request):
+
+    if request.user.is_authenticated:
+        user_subplateform = UserOwnedSubPlateform.objects.filter(
+            user=request.user
+        )
+        context = request.session['context']
+        context["user_subplateform"] = user_subplateform
+        return render(
+            request, "collection/subplateform_collection.html", context)
+    return redirect("index")
+
+def user_consoles_page(request, consoles_id):
+
+    if request.user.is_authenticated:
+        user_plat = get_object_or_404(
+            UserOwnedSubPlateform.objects.filter(
+                id=consoles_id, user=request.user))
+        if request.method == "POST":
+            if request.POST.get("delete") is None:
+                form = PlateformCreationForm(
+                    request.POST, request.FILES)
+                print(request.POST)
+                if form.is_valid():
+                    picture = form.cleaned_data["picture"]
+                    user_plat.subplateform =\
+                        form.cleaned_data["subplateform"]
+                    user_plat.picture = picture
+                    user_plat.box_condition =\
+                        form.cleaned_data["box_condition"]
+                    user_plat.manual_condition =\
+                        form.cleaned_data["manual_condition"]
+                    user_plat.subplateform_condition =\
+                        form.cleaned_data["subplateform_condition"]
+                    user_plat.condition_precision =\
+                        form.cleaned_data["condition_precision"]
+                    user_plat.save()
+            else:
+                UserOwnedSubPlateform.objects.get(
+                    id=request.POST.get("delete")).delete()
+                return redirect("user_consoles")
+        form = PlateformCreationForm(instance=user_plat)
+        context = {
+            "username": request.session["context"]["username"],
+            "email": request.session["context"]["email"],
+            "name": request.session["context"]["name"],
+            "form": form,
+            "modify": True,
+            "user_plat": user_plat,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
+        return render(request, "collection/add_console.html", context)
+    return redirect("index")
+
+def user_compilations(request):
+
+    if request.user.is_authenticated:
+        user_comp = UserOwnedCompilation.objects.filter(
+            user=request.user
+        )
+        context = request.session['context']
+        context["user_comp"] = user_comp
+        return render(request, "collection/comp_collection.html", context)
+    return redirect("index")
+
+def user_compilations_page(request, compilations_id):
+
+    if request.user.is_authenticated:
+        user_comp = get_object_or_404(
+            UserOwnedCompilation.objects.filter(
+                id=compilations_id))
+        if request.method == "POST":
+            if request.POST.get("delete") is None:
+                form = CompilCreationForm(
+                    request.POST, request.FILES)
+                if form.is_valid():
+                    user_comp.compilation_id = form.cleaned_data[
+                        "compilation_id"]
+                    user_comp.compilation_name = form.cleaned_data[
+                        "compilation_name"]
+                    if user_comp.compilation_id is None:
+                        user_comp.plateform_id = form.cleaned_data[
+                            "plateform_id"]
+                    else:
+                        plateform_id = get_object_or_404(
+                            Compilation.objects.filter(
+                                id=user_comp.compilation_id.id))
+                        user_comp.plateform_id = plateform_id.plateform
+                    user_comp.physical = form.cleaned_data["physical"]
+                    user_comp.picture = form.cleaned_data["picture"]
+                    user_comp.box_condition = form.cleaned_data[
+                        "box_condition"]
+                    user_comp.covers_condition = form.cleaned_data[
+                        "covers_condition"]
+                    user_comp.manual_condition = form.cleaned_data[
+                        "manual_condition"]
+                    user_comp.game_condition = form.cleaned_data[
+                        "game_condition"]
+                    user_comp.condition_precision = form.cleaned_data[
+                        "condition_precision"]
+                    user_comp.owning_status = form.cleaned_data[
+                        "owning_status"]
+                    user_comp.save()
+            else:
+                UserOwnedCompilation.objects.get(
+                    id=request.POST.get("delete")).delete()
+                return redirect("user_compilations")
+        form = CompilCreationForm(instance=user_comp)
+        context = {
+            "username": request.session["context"]["username"],
+            "email": request.session["context"]["email"],
+            "name": request.session["context"]["name"],
+            "form": form,
+            "user_game": user_comp,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
+        return render(request, "collection/add_comp.html", context)
+    return redirect("index")
