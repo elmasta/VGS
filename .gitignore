@@ -1,12 +1,4 @@
-env/Lib/site-packages/*
-env/Lib/site-packages/django_messages/__pycache__/
-env/Lib/site-packages/django_messages/migrations/__pycache__/
-env/Lib/site-packages/django_messages/templatetags/__pycache__/
-env/Scripts/
-env/Include/
-env/pyvenv.cfg
-!env/Lib/site-packages/django_messages/
-!env/Lib/site-packages/django_messages-0.6.0-py3.8.egg-info/
+env/
 VGS_project/VGS_project/__pycache__/
 VGS_project/collection/__pycache__/
 VGS_project/collection/migrations/__pycache__/
