@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
@@ -23,8 +24,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('collection/', include('collection.urls')),
     path('messages/', include('django_messages.urls')),
-    # todo change admin route
-    path('admin/', admin.site.urls),
+    path(str(os.getenv("ADMIN_LINK")), admin.site.urls),
 ]
 
 if settings.DEBUG:

@@ -23,7 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = str(os.getenv("DJANKEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.getenv("ENV") is True:
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -32,8 +35,8 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'collection.apps.CollectionConfig',
+    'django_messages.apps.DjangoMessagesConfig',
     'django.contrib.sites',
-    'django_messages',
     'django_cleanup',
     'django.contrib.admin',
     'django.contrib.auth',

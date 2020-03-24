@@ -77,7 +77,8 @@ class UserData(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profil_picture = models.ImageField(upload_to=get_userpic_path, blank=True,
-                                       null=True, validators=[validate_picture])
+                                       null=True,
+                                       validators=[validate_picture])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -199,7 +200,7 @@ class GameDLC(models.Model):
 
     def __str__(self):
 
-        return self.name + " - " + str(self.plateform)
+        return self.name + " - DLC de " + str(self.game.name)
 
     name = models.CharField(max_length=100)
     game = models.ForeignKey(Games, on_delete=models.CASCADE)

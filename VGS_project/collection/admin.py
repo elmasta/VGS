@@ -27,29 +27,3 @@ class GamesAdmin(admin.ModelAdmin):
 @admin.register(GameDLC)
 class GameDLCAdmin(admin.ModelAdmin):
     pass
-
-#everything bellow will be deleted after final testing
-@admin.register(UserData)
-class UserDataAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(UserOwnedGame)
-class UserOwnedGameAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(UserOwnedCompilation)
-class UserOwnedCompilationAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(UserOwnedSubPlateform)
-class UserOwnedSubPlateformAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(UserOwnedPlateformAddon)
-class UserOwnedPlateformAddonAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(UserOwnedGameDLC)
-class UserOwnedGameDLCAdmin(admin.ModelAdmin):
-    pass
-

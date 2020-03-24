@@ -1,8 +1,7 @@
-from collection.models import UserData, UserOwnedGame, Games, Compilation,\
+from collection.models import UserData, UserOwnedGame, CollectionPicture,\
     UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon,\
-    UserOwnedGameDLC, CollectionPicture
+    UserOwnedGameDLC
 from django.contrib.auth.models import User
-from django.forms.utils import ErrorList
 from django import forms
 
 class UserCreationForm(forms.ModelForm):
