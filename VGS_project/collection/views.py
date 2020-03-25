@@ -67,7 +67,7 @@ def login_page(request):
                     request.session["context"] = user_plateforms(
                         request, UserOwnedGame, Plateform, ELEM)
                     return redirect("index")
-                context["errors"] = "Vous n'avez pas activé votre compte"
+                context["errors"] = "Compte non actif ou mot de passe invalide"
             else:
                 context["errors"] = "Ce pseudo est inconnu"
     form = UserLoginForm()
@@ -161,7 +161,8 @@ def forgotten_password(request, uidb64, token):
 
 def user_logout(request):
 
-    logout(request)
+    if request.user.is_authenticated:
+        logout(request)
     return redirect("index")
 
 def profile_page(request):
