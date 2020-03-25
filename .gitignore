@@ -7,3 +7,4 @@ VGS_project/collection/migrations/__pycache__/
 VGS_project/django_messages/__pycache__
 VGS_project/django_messages/migrations/__pycache__
 VGS_project/django_messages/templatetags/__pycache__
+VGS_project/django_messages/management/commands/__pycache__/

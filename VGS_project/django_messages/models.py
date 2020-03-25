@@ -47,6 +47,13 @@ class MessageManager(models.Manager):
             sender_deleted_at__isnull=False,
         )
 
+    def del_trash(self):
+        """
+        Return all messages in trash to be deleted
+        """
+        return self.filter(recipient_deleted_at__isnull=False
+            ) | self.filter(recipient_deleted_at__isnull=False)
+
 
 @python_2_unicode_compatible
 class Message(models.Model):
