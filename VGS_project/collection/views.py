@@ -1,8 +1,7 @@
 from collection.func import *
 from collection.forms import *
+from collection.models import *
 from collection.tokens import account_activation_token
-from collection.models import UserData, Games, UserOwnedGame, Plateform,\
-    UserOwnedSubPlateform, CollectionPicture, ELEM, Compilation
 from django.db.models import Count
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
@@ -13,6 +12,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 
 def index(request):
+    """view that send the user to the index"""
 
     user_games = UserOwnedGame.objects.values("game_id_id").annotate(
         c=Count("game_id")).order_by('-c')[:10]
@@ -31,6 +31,7 @@ def index(request):
         request, "collection/index.html", {"games_name": games_name})
 
 def about(request):
+    """view that send the user to the about page"""
 
     if request.user.is_authenticated:
         return render(
@@ -38,6 +39,8 @@ def about(request):
     return render(request, "collection/about.html")
 
 def login_page(request):
+    """view used to login the user. if the user is already logged in, he will
+    be redirected to the index instead"""
 
     context = {}
     if request.user.is_authenticated:
@@ -75,6 +78,8 @@ def login_page(request):
     return render(request, "collection/login.html", context)
 
 def ask_email(request):
+    """view used when an user forgot his password. A mail is sent to him with
+    a link to change his password if he send the right username"""
 
     context = {}
     if request.user.is_authenticated:
@@ -94,6 +99,8 @@ def ask_email(request):
     return render(request, "collection/check_email.html", context)
 
 def register_page(request):
+    """view used when an user wants to register. A confirmation email with a
+    link is sent that ask to activate his account"""
 
     context = {}
     if request.user.is_authenticated:
@@ -124,6 +131,7 @@ def register_page(request):
     return render(request, "collection/register.html", context)
 
 def activate(request, uidb64, token):
+    """view used to activate an account"""
 
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -137,6 +145,8 @@ def activate(request, uidb64, token):
     return HttpResponse("Le lien n'est pas valide")
 
 def forgotten_password(request, uidb64, token):
+    """view used to change an user password (after the user clicked on the
+    link sent by the ask_email view"""
 
     if request.user.is_authenticated:
         return redirect("index")
@@ -160,12 +170,14 @@ def forgotten_password(request, uidb64, token):
     return HttpResponse("Le lien n'est pas valide")
 
 def user_logout(request):
+    """view used to logout the user"""
 
     if request.user.is_authenticated:
         logout(request)
     return redirect("index")
 
 def profile_page(request):
+    """view used to show the user profil page"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -214,6 +226,7 @@ def profile_page(request):
     return redirect("login_page")
 
 def user_photos(request):
+    """view used to show the user collection photos page"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -245,6 +258,7 @@ def user_photos(request):
     return redirect("index")
 
 def add_item(request):
+    """view used to ask the user what he want to add in his collection"""
 
     if request.user.is_authenticated:
         return render(request, "collection/add_item.html",
@@ -252,10 +266,10 @@ def add_item(request):
     return redirect("index")
 
 def add_game(request):
+    """view that make the user be able to add a game in his collection"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
-
             form = GameCreationForm(
                 request.POST, request.FILES, current_user=request.user)
             if form.is_valid():
@@ -296,13 +310,19 @@ def add_game(request):
                 request.session["context"] = user_plateforms(
                     request, UserOwnedGame, Plateform, ELEM
                 )
-        context = request.session['context']
         form = GameCreationForm()
-        context["form"] = form
+        context = {
+            "username": request.session["context"]["username"],
+            "email": request.session["context"]["email"],
+            "form": form,
+            "profil_pic": request.session["context"]["profil_pic"],
+            "platfor_user": request.session["context"]["platfor_user"]
+        }
         return render(request, "collection/add_game.html", context)
     return redirect("index")
 
 def add_DLC(request):
+    """view that make the user be able to add a DLC in his collection"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -334,6 +354,8 @@ def add_DLC(request):
     return redirect("index")
 
 def add_comp(request):
+    """view that make the user be able to add a compilation in his
+    collection"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -369,6 +391,7 @@ def add_comp(request):
     return redirect("index")
 
 def add_console(request):
+    """view that make the user be able to add a console in his collection"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -393,6 +416,8 @@ def add_console(request):
     return redirect("index")
 
 def add_addon(request):
+    """view that make the user be able to add an accessory in his
+    collection"""
 
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -417,6 +442,9 @@ def add_addon(request):
     return redirect("index")
 
 def user_collection(request, plateform_id):
+    """view that show a table with all the game the user has. if plateform_id
+    is 0 or not a number, the table will contain every game of every plateform
+    . It will show only games from one plateform otherwise"""
 
     if request.user.is_authenticated:
         if plateform_id.isdecimal():
@@ -440,6 +468,8 @@ def user_collection(request, plateform_id):
     return redirect("index")
 
 def user_game_page(request, game_id):
+    """view that make the user be able to modify or delete a game of his
+    collection"""
 
     if request.user.is_authenticated:
         if game_id.isdecimal():
@@ -454,7 +484,7 @@ def user_game_page(request, game_id):
                     if form.is_valid():
                         user_game.game_id = form.cleaned_data["game_id"]
                         user_game.game_name = form.cleaned_data["game_name"]
-                        if game_id is None:
+                        if user_game.game_id is None:
                             user_game.plateform_id = form.cleaned_data[
                                 "plateform_id"]
                         else:
@@ -520,6 +550,7 @@ def user_game_page(request, game_id):
     return redirect("index")
 
 def user_accessory(request):
+    """view that show a table with all the accessories the user has."""
 
     if request.user.is_authenticated:
         user_plateform_addon = UserOwnedPlateformAddon.objects.filter(
@@ -532,6 +563,8 @@ def user_accessory(request):
     return redirect("index")
 
 def user_accessory_page(request, accessory_id):
+    """view that make the user be able to modify or delete an accessory of his
+    collection"""
 
     if request.user.is_authenticated:
         if accessory_id.isdecimal():
@@ -574,6 +607,7 @@ def user_accessory_page(request, accessory_id):
     return redirect("index")
 
 def user_consoles(request):
+    """view that show a table with all the consoles the user has."""
 
     if request.user.is_authenticated:
         user_subplateform = UserOwnedSubPlateform.objects.filter(
@@ -586,6 +620,8 @@ def user_consoles(request):
     return redirect("index")
 
 def user_consoles_page(request, consoles_id):
+    """view that make the user be able to modify or delete a console of his
+    collection"""
 
     if request.user.is_authenticated:
         if consoles_id.isdecimal():
@@ -629,6 +665,7 @@ def user_consoles_page(request, consoles_id):
     return redirect("index")
 
 def user_compilations(request):
+    """view that show a table with all the compilations the user has."""
 
     if request.user.is_authenticated:
         user_comp = UserOwnedCompilation.objects.filter(
@@ -640,6 +677,8 @@ def user_compilations(request):
     return redirect("index")
 
 def user_compilations_page(request, compilations_id):
+    """view that make the user be able to modify or delete a compilation of
+    his collection"""
 
     if request.user.is_authenticated:
         if compilations_id.isdecimal():
@@ -697,6 +736,7 @@ def user_compilations_page(request, compilations_id):
     return redirect("index")
 
 def user_dlc_page(request, dlc_id):
+    """view that show a table with all the DLC the user has."""
 
     if request.user.is_authenticated:
         if dlc_id.isdecimal():
@@ -735,8 +775,7 @@ def user_dlc_page(request, dlc_id):
                 else:
                     UserOwnedGameDLC.objects.get(
                         id=request.POST.get("delete")).delete()
-                    return redirect("user_game_page",
-                                    game_id=form.cleaned_data["gameowned_id"])
+                    return redirect("user_collection", plateform_id=0)
             form = DLCCreationForm(instance=user_dlc)
             context = {
                 "username": request.session["context"]["username"],

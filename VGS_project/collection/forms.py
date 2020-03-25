@@ -1,6 +1,4 @@
-from collection.models import UserData, UserOwnedGame, CollectionPicture,\
-    UserOwnedCompilation, UserOwnedSubPlateform, UserOwnedPlateformAddon,\
-    UserOwnedGameDLC
+from collection.models import *
 from django.contrib.auth.models import User
 from django import forms
 

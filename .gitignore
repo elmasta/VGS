@@ -1,6 +1,9 @@
 env/
+VGS_project/__pycache__/
+VGS_project/media/
 VGS_project/VGS_project/__pycache__/
 VGS_project/collection/__pycache__/
 VGS_project/collection/migrations/__pycache__/
-VGS_project/__pycache__/
-VGS_project/media/
+VGS_project/django_messages/__pycache__
+VGS_project/django_messages/migrations/__pycache__
+VGS_project/django_messages/templatetags/__pycache__

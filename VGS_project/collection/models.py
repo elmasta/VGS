@@ -3,7 +3,6 @@ from six import BytesIO
 from PIL import Image
 from django.db import models
 from django.contrib.auth.models import User
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy
 from django.core.exceptions import ValidationError
 
